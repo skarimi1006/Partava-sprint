@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part Ava — Login</title>
+<style>
+@font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:300;font-display:swap;src:url("/fonts/IBMPlexSans-Light.woff2") format("woff2");}
+@font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:400;font-display:swap;src:url("/fonts/IBMPlexSans-Regular.woff2") format("woff2");}
+@font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:500;font-display:swap;src:url("/fonts/IBMPlexSans-Medium.woff2") format("woff2");}
+@font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:600;font-display:swap;src:url("/fonts/IBMPlexSans-SemiBold.woff2") format("woff2");}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url("/fonts/IBMPlexMono-Regular.woff2") format("woff2");}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url("/fonts/IBMPlexMono-SemiBold.woff2") format("woff2");}
+</style>
+<style>
+:root{--teal:#00928A;--teal-dim:#007a73;--bg:#1a1a1a;--surface:#262626;--border:rgba(255,255,255,0.09);--text:#e8e6e6;--muted:#6a6868;--error:#D94F3D;}
+[data-theme=light]{--bg:#f2f2f2;--surface:#ffffff;--border:rgba(0,0,0,0.1);--text:#1e1e1e;--muted:#888;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;transition:background 0.25s,color 0.25s;}
+.bg-glow{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,146,138,0.09) 0%,transparent 60%);pointer-events:none;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:44px 40px;width:100%;max-width:420px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,0.25);}
+.theme-btn{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--muted);padding:6px 11px;border-radius:6px;cursor:pointer;font-size:16px;transition:border-color 0.2s;}
+.theme-btn:hover{border-color:var(--teal);}
+.logo-wrap{display:flex;align-items:center;justify-content:center;gap:13px;margin-bottom:6px;}
+.logo-mark{width:44px;height:44px;background:var(--teal);clip-path:polygon(0 0,70% 0,100% 30%,100% 100%,30% 100%,0 70%);flex-shrink:0;}
+.logo-text{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:22px;letter-spacing:0.08em;}
+.logo-text span{color:var(--teal);}
+.company{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.05em;color:var(--muted);text-align:center;margin-bottom:32px;}
+h2{font-size:22px;font-weight:500;margin-bottom:26px;text-align:center;}
+.field{margin-bottom:20px;}
+label{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:14px 16px;font-family:'IBM Plex Sans',sans-serif;font-size:16px;border-radius:8px;outline:none;transition:border-color 0.2s;}
+input:focus{border-color:var(--teal);}
+.btn{width:100%;background:var(--teal);border:none;color:#fff;padding:15px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:8px;margin-top:6px;transition:opacity 0.2s;}
+.btn:hover{opacity:0.88;}
+.btn:disabled{opacity:0.45;cursor:not-allowed;}
+.err{color:var(--error);font-size:13px;margin-top:12px;font-family:'IBM Plex Mono',monospace;min-height:20px;text-align:center;}
+.footer{margin-top:26px;text-align:center;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="card">
+  <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀️</button>
+  <div class="logo-wrap">
+    <div class="logo-mark"></div>
+    <div class="logo-text">PEA<span>VA</span></div>
+  </div>
+  <div class="company">Part Ava Software Development Co.</div>
+  <h2>Sign in</h2>
+  <div class="field">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="your username" autocomplete="username" autofocus>
+  </div>
+  <div class="field">
+    <label>PIN</label>
+    <input type="password" id="pin" placeholder="••••" maxlength="8" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+  </div>
+  <div class="err" id="err"></div>
+  <button class="btn" id="loginBtn" onclick="login()">Enter</button>
+  <div class="footer">PEA &copy; 2026</div>
+</div>
+<script>
+var theme=localStorage.getItem('pea-theme')||'dark';
+document.documentElement.setAttribute('data-theme',theme);
+document.getElementById('themeBtn').textContent=theme==='dark'?'☀️':'🌙';
+function toggleTheme(){
+  theme=theme==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',theme);
+  localStorage.setItem('pea-theme',theme);
+  document.getElementById('themeBtn').textContent=theme==='dark'?'☀️':'🌙';
+}
+async function login(){
+  var u=document.getElementById('username').value.trim();
+  var p=document.getElementById('pin').value.trim();
+  var err=document.getElementById('err'),btn=document.getElementById('loginBtn');
+  if(!u||!p){err.textContent='Enter username and PIN.';return;}
+  btn.disabled=true;err.textContent='';
+  try{
+    var r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,pin:p})});
+    var d=await r.json();
+    if(!r.ok){err.textContent=d.error||'Login failed.';btn.disabled=false;return;}
+    window.location.href=d.role==='admin'?'/admin':'/dashboard';
+  }catch(e){err.textContent='Server unreachable.';btn.disabled=false;}
+}
+fetch('/api/me').then(function(r){return r.json();}).then(function(d){if(d.role)window.location.href=d.role==='admin'?'/admin':'/dashboard';}).catch(function(){});
+</script>
+</body>
+</html>

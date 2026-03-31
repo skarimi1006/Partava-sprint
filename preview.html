@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peava Platform — Preview</title>
+<style>
+  :root {
+    --teal: #00928A; --dark: #1A1A2E; --surface: #F5F7FA;
+    --text: #2D2D2D; --muted: #888; --danger: #D94F3D;
+    --warning: #E8A838; --success: #2E9E5B; --blue: #4A90D9;
+    --mono: 'Courier New', monospace;
+  }
+  [data-theme="dark"] {
+    --bg: #0F0F1A; --bg2: #1A1A2E; --bg3: #242438;
+    --border: #2e2e4a; --text: #E8E8F0; --muted: #666;
+  }
+  [data-theme="light"] {
+    --bg: #F5F7FA; --bg2: #fff; --bg3: #eef0f5;
+    --border: #dde1ea; --text: #2D2D2D; --muted: #999;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 13px; display: flex; height: 100vh; overflow: hidden; }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 200px; background: var(--bg2); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; flex-shrink: 0;
+  }
+  .logo { padding: 16px; border-bottom: 1px solid var(--border); }
+  .logo span { color: var(--teal); font-size: 15px; font-weight: bold; letter-spacing: 1px; }
+  .logo small { display: block; color: var(--muted); font-size: 10px; margin-top: 2px; }
+  nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+  nav a {
+    display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+    color: var(--muted); text-decoration: none; cursor: pointer;
+    border-left: 3px solid transparent; transition: all 0.15s;
+  }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+  nav a.active { color: var(--teal); border-left-color: var(--teal); background: var(--bg3); }
+  nav a .icon { width: 16px; text-align: center; font-size: 14px; }
+  .nav-section { padding: 10px 16px 4px; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .user-area { padding: 12px 16px; border-top: 1px solid var(--border); }
+  .user-area .uname { color: var(--text); font-size: 12px; }
+  .user-area .urole { color: var(--teal); font-size: 10px; }
+
+  /* MAIN */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #topbar {
+    height: 48px; background: var(--bg2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px;
+  }
+  #topbar h2 { flex: 1; font-size: 13px; color: var(--text); }
+  .btn { padding: 5px 12px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); cursor: pointer; font-family: var(--mono); font-size: 12px; }
+  .btn:hover { border-color: var(--teal); color: var(--teal); }
+  .btn-teal { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .btn-teal:hover { background: #007a73; color: #fff; }
+  .notif-btn { position: relative; background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; padding: 5px 9px; font-size: 13px; }
+  .notif-btn .badge { position: absolute; top: -4px; right: -4px; background: var(--danger); color: #fff; font-size: 9px; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+  #panel { flex: 1; overflow-y: auto; padding: 20px; }
+
+  /* KPI CARDS */
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi { background: var(--bg2); border: 1px solid var(--border); padding: 14px 16px; }
+  .kpi .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .kpi .val { font-size: 26px; font-weight: bold; margin: 4px 0 2px; }
+  .kpi .sub { font-size: 10px; color: var(--muted); }
+  .kpi.critical .val { color: var(--danger); }
+  .kpi.high .val { color: var(--warning); }
+  .kpi.prog .val { color: var(--blue); }
+  .kpi.done .val { color: var(--success); }
+  .kpi.total .val { color: var(--teal); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .tab { padding: 8px 16px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; font-size: 12px; }
+  .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+  .toolbar input { flex: 1; max-width: 220px; padding: 5px 10px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 12px; }
+  .filter-tag { padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); color: var(--muted); font-size: 11px; cursor: pointer; }
+  .filter-tag.on { border-color: var(--teal); color: var(--teal); }
+
+  /* TASK TABLE */
+  .task-table { width: 100%; border-collapse: collapse; }
+  .task-table th { text-align: left; padding: 8px 10px; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+  .task-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .task-table tr:hover td { background: var(--bg3); }
+  .badge { display: inline-block; padding: 2px 8px; font-size: 10px; border-radius: 2px; }
+  .badge.critical { background: rgba(217,79,61,0.15); color: var(--danger); }
+  .badge.high { background: rgba(232,168,56,0.15); color: var(--warning); }
+  .badge.medium { background: rgba(74,144,217,0.15); color: var(--blue); }
+  .badge.low { background: rgba(136,136,136,0.1); color: var(--muted); }
+  .badge.todo { background: rgba(136,136,136,0.1); color: var(--muted); }
+  .badge.inprog { background: rgba(74,144,217,0.15); color: var(--blue); }
+  .badge.done { background: rgba(46,158,91,0.15); color: var(--success); }
+  .badge.dev { background: rgba(74,144,217,0.1); color: var(--blue); }
+  .badge.qc { background: rgba(0,146,138,0.1); color: var(--teal); }
+  .badge.bug { background: rgba(217,79,61,0.1); color: var(--danger); }
+  .age { font-size: 10px; padding: 1px 6px; border-radius: 2px; }
+  .age.fresh { background: rgba(46,158,91,0.1); color: var(--success); }
+  .age.mid { background: rgba(232,168,56,0.1); color: var(--warning); }
+  .age.old { background: rgba(217,79,61,0.1); color: var(--danger); }
+  .avatar { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; font-weight: bold; margin-right: 6px; }
+  .team-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .chk { width: 14px; height: 14px; cursor: pointer; accent-color: var(--teal); }
+  .bulk-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg3); border: 1px solid var(--teal); margin-bottom: 8px; font-size: 11px; }
+  .bulk-bar span { color: var(--teal); }
+
+  /* KANBAN */
+  .kanban { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .kanban-col { background: var(--bg2); border: 1px solid var(--border); }
+  .kanban-col-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+  .kanban-col-head .count { background: var(--bg3); padding: 1px 7px; font-size: 10px; color: var(--muted); }
+  .kanban-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
+  .kcard { background: var(--bg3); border: 1px solid var(--border); padding: 10px 12px; cursor: pointer; }
+  .kcard:hover { border-color: var(--teal); }
+  .kcard .ktitle { font-size: 12px; margin-bottom: 6px; }
+  .kcard .kmeta { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* NOTIFICATIONS PANEL */
+  .notif-panel { position: fixed; right: 0; top: 48px; width: 300px; background: var(--bg2); border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); z-index: 100; display: none; }
+  .notif-panel.open { display: block; }
+  .notif-panel-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 11px; color: var(--muted); }
+  .notif-item { padding: 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .notif-item:hover { background: var(--bg3); }
+  .notif-item .ntitle { font-size: 12px; margin-bottom: 3px; }
+  .notif-item .nmeta { font-size: 10px; color: var(--muted); }
+  .notif-item.unread { border-left: 3px solid var(--teal); }
+
+  /* HIDDEN PANELS */
+  .panel-section { display: none; }
+  .panel-section.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="logo">
+    <span>PEAVA</span>
+    <small>Internal Platform v1.0</small>
+  </div>
+  <nav>
+    <div class="nav-section">Operations</div>
+    <a class="active" onclick="showPanel('sprint')"><span class="icon">▣</span> Sprint Board</a>
+    <a onclick="showPanel('assets')"><span class="icon">◈</span> Assets</a>
+    <a onclick="showPanel('qc')"><span class="icon">✓</span> QC Tests</a>
+    <a onclick="showPanel('issues')"><span class="icon">⚑</span> Issues</a>
+    <div class="nav-section">Releases</div>
+    <a onclick="showPanel('deployments')"><span class="icon">↑</span> Deployments</a>
+    <a onclick="showPanel('delivery')"><span class="icon">✉</span> Delivery</a>
+    <div class="nav-section">Knowledge</div>
+    <a onclick="showPanel('knowledge')"><span class="icon">≡</span> Knowledge Base</a>
+    <a onclick="showPanel('reports')"><span class="icon">◎</span> Reports</a>
+  </nav>
+  <div class="user-area">
+    <div class="uname">saeed</div>
+    <div class="urole">● Admin</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <h2 id="topbar-title">Sprint Board</h2>
+    <button class="btn" onclick="toggleTheme()">☀ Theme</button>
+    <button class="btn" onclick="toggleLang()">FA/EN</button>
+    <button class="notif-btn" onclick="toggleNotif()">
+      🔔 <span class="badge">3</span>
+    </button>
+  </div>
+  <div id="panel">
+
+    <!-- SPRINT PANEL -->
+    <div id="panel-sprint" class="panel-section active">
+      <div class="kpi-row">
+        <div class="kpi total"><div class="label">Total Tasks</div><div class="val">24</div><div class="sub">this sprint</div></div>
+        <div class="kpi critical"><div class="label">Critical</div><div class="val">3</div><div class="sub">need attention</div></div>
+        <div class="kpi high"><div class="label">High</div><div class="val">7</div><div class="sub">priority</div></div>
+        <div class="kpi prog"><div class="label">In Progress</div><div class="val">9</div><div class="sub">active</div></div>
+        <div class="kpi done"><div class="label">Done</div><div class="val">8</div><div class="sub">this week</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'sprint-tasks')">Tasks</div>
+        <div class="tab" onclick="switchTab(this,'sprint-kanban')">Kanban</div>
+        <div class="tab" onclick="switchTab(this,'sprint-archive')">Archive</div>
+      </div>
+      <!-- TASKS TAB -->
+      <div id="sprint-tasks">
+        <div class="toolbar">
+          <button class="btn btn-teal">+ New Task</button>
+          <input type="text" placeholder="Search tasks…">
+          <span class="filter-tag on">All Teams</span>
+          <span class="filter-tag">Dev</span>
+          <span class="filter-tag">QC</span>
+          <span style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn">Export XLSX</button>
+            <button class="btn">Reset Sprint</button>
+          </span>
+        </div>
+        <div class="bulk-bar" style="display:none">
+          <span>2 selected</span>
+          <button class="btn" style="font-size:10px">Set Status ▾</button>
+          <button class="btn" style="font-size:10px">Set Priority ▾</button>
+        </div>
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="chk"></th>
+              <th>Task</th><th>Category</th><th>Assigned</th><th>Customer</th>
+              <th>Priority</th><th>Status</th><th>Age</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" class="chk"></td>
+              <td>Fix TLS handshake on PAX A920 <br><small style="color:var(--muted)">v2.4.1 · EMV issue</small></td>
+              <td><span class="badge bug">Bug Fix</span></td>
+              <td><span class="avatar" style="background:#00928A22;color:var(--teal)">H</span>hiva</td>
+              <td>Sadad Bank</td>
+              <td><span class="badge critical">Critical</span></td>
+              <td><span class="badge inprog">In Progress</span></td>
+              <td><span class="age old">5d</span></td>
+              <td><button class="btn" style="font-size:10px;padding:3px 8px">Edit</button> <button class="btn" style="font-size:10px;padding:3px 8px">💬</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"></td>
+              <td>Implement contactless reader test suite<br><small style="color:var(--muted)">v3.0.0 · batch B-041</small></td>
+              <td><span class="badge qc">QC Test</span></td>
+              <td><span class="avatar" style="background:#4A90D922;color:var(--blue)">A</span>ali</td>
+              <td>PEP</td>
+              <td><span class="badge high">High</span></td>
+              <td><span class="badge inprog">In Progress</span></td>
+              <td><span class="age mid">2d</span></td>
+              <td><button class="btn" style="font-size:10px;padding:3px 8px">Edit</button> <button class="btn" style="font-size:10px;padding:3px 8px">💬</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"></td>
+              <td>Update receipt printer driver<br><small style="color:var(--muted)">v2.4.2 · Newland N910</small></td>
+              <td><span class="badge dev">Development</span></td>
+              <td><span class="avatar" style="background:rgba(0,146,138,.2);color:var(--teal)">S</span>saeed</td>
+              <td>Internal</td>
+              <td><span class="badge medium">Medium</span></td>
+              <td><span class="badge todo">To Do</span></td>
+              <td><span class="age fresh">1d</span></td>
+              <td><button class="btn" style="font-size:10px;padding:3px 8px">Edit</button> <button class="btn" style="font-size:10px;padding:3px 8px">💬</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="chk"></td>
+              <td>Document SDK integration guide<br><small style="color:var(--muted)">v3.0.0 · knowledge base</small></td>
+              <td><span class="badge dev">R&D</span></td>
+              <td><span class="avatar" style="background:#4A90D922;color:var(--blue)">A</span>ali</td>
+              <td>—</td>
+              <td><span class="badge low">Low</span></td>
+              <td><span class="badge done">Done</span></td>
+              <td><span class="age fresh">Today</span></td>
+              <td><button class="btn" style="font-size:10px;padding:3px 8px">Edit</button> <button class="btn" style="font-size:10px;padding:3px 8px">💬</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- KANBAN TAB -->
+      <div id="sprint-kanban" style="display:none">
+        <div class="kanban">
+          <div class="kanban-col">
+            <div class="kanban-col-head">To Do <span class="count">6</span></div>
+            <div class="kanban-body">
+              <div class="kcard">
+                <div class="ktitle">Update receipt printer driver</div>
+                <div class="kmeta"><span class="badge medium">Medium</span><span class="badge dev">Development</span></div>
+              </div>
+              <div class="kcard">
+                <div class="ktitle">Write onboarding checklist</div>
+                <div class="kmeta"><span class="badge low">Low</span><span class="badge qc">R&D</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-head">In Progress <span class="count">9</span></div>
+            <div class="kanban-body">
+              <div class="kcard" style="border-left:3px solid var(--danger)">
+                <div class="ktitle">Fix TLS handshake on PAX A920</div>
+                <div class="kmeta"><span class="badge critical">Critical</span><span class="badge bug">Bug Fix</span></div>
+              </div>
+              <div class="kcard" style="border-left:3px solid var(--warning)">
+                <div class="ktitle">Contactless reader test suite</div>
+                <div class="kmeta"><span class="badge high">High</span><span class="badge qc">QC Test</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-head">Done <span class="count">8</span></div>
+            <div class="kanban-body">
+              <div class="kcard" style="opacity:.7">
+                <div class="ktitle">SDK integration guide</div>
+                <div class="kmeta"><span class="badge done">Done</span><span class="badge dev">R&D</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ARCHIVE TAB -->
+      <div id="sprint-archive" style="display:none">
+        <p style="color:var(--muted);font-size:12px;padding:20px 0">Archived tasks from previous sprints appear here.</p>
+      </div>
+    </div>
+
+    <!-- ASSETS PANEL -->
+    <div id="panel-assets" class="panel-section">
+      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi total"><div class="label">Total Assets</div><div class="val">142</div><div class="sub">registered</div></div>
+        <div class="kpi done"><div class="label">Deployed</div><div class="val">98</div><div class="sub">at customer sites</div></div>
+        <div class="kpi prog"><div class="label">In QC</div><div class="val">12</div><div class="sub">being tested</div></div>
+        <div class="kpi critical"><div class="label">Faulty</div><div class="val">4</div><div class="sub">need repair</div></div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-teal">+ Add Asset</button>
+        <input type="text" placeholder="Search serial / model…">
+        <span class="filter-tag on">All</span>
+        <span class="filter-tag">In Stock</span>
+        <span class="filter-tag">Deployed</span>
+        <span class="filter-tag">Faulty</span>
+      </div>
+      <table class="task-table">
+        <thead><tr><th>Serial</th><th>Model</th><th>Type</th><th>Customer</th><th>Status</th><th>Firmware</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td>SN-PAX-00421</td><td>PAX A920</td><td>Terminal</td><td>Sadad Bank</td><td><span class="badge done">Deployed</span></td><td>v2.4.1</td><td><button class="btn" style="font-size:10px;padding:3px 8px">View</button></td></tr>
+          <tr><td>SN-NLD-00115</td><td>Newland N910</td><td>Terminal</td><td>PEP</td><td><span class="badge inprog">In QC</span></td><td>v3.0.0</td><td><button class="btn" style="font-size:10px;padding:3px 8px">View</button></td></tr>
+          <tr><td>SN-PAX-00389</td><td>PAX A910</td><td>Terminal</td><td>—</td><td><span class="badge todo">In Stock</span></td><td>v2.3.8</td><td><button class="btn" style="font-size:10px;padding:3px 8px">View</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- QC PANEL -->
+    <div id="panel-qc" class="panel-section">
+      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi total"><div class="label">Tests This Month</div><div class="val">31</div></div>
+        <div class="kpi done"><div class="label">Pass</div><div class="val">24</div></div>
+        <div class="kpi high"><div class="label">Partial</div><div class="val">4</div></div>
+        <div class="kpi critical"><div class="label">Fail</div><div class="val">3</div></div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-teal">+ New QC Test</button>
+        <input type="text" placeholder="Search asset / batch…">
+      </div>
+      <table class="task-table">
+        <thead><tr><th>Date</th><th>Asset</th><th>Firmware</th><th>Tester</th><th>Cases</th><th>Result</th><th>Tasks</th></tr></thead>
+        <tbody>
+          <tr><td>1404/01/10</td><td>PAX A920 · SN-PAX-00421</td><td>v2.4.1</td><td>hiva</td><td>8/10 pass</td><td><span class="badge high" style="background:rgba(232,168,56,0.15)">Partial</span></td><td><a style="color:var(--teal);font-size:11px">2 tasks ↗</a></td></tr>
+          <tr><td>1404/01/09</td><td>Newland N910 · SN-NLD-00115</td><td>v3.0.0</td><td>ali</td><td>10/10 pass</td><td><span class="badge done">Pass</span></td><td>—</td></tr>
+          <tr><td>1404/01/08</td><td>PAX A910 · SN-PAX-00389</td><td>v2.3.8</td><td>hiva</td><td>3/10 pass</td><td><span class="badge critical">Fail</span></td><td><a style="color:var(--teal);font-size:11px">3 tasks ↗</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ISSUES PANEL -->
+    <div id="panel-issues" class="panel-section">
+      <div class="toolbar">
+        <button class="btn btn-teal">+ Report Issue</button>
+        <input type="text" placeholder="Search issues…">
+        <span class="filter-tag on">Open</span><span class="filter-tag">In Progress</span><span class="filter-tag">Resolved</span>
+      </div>
+      <table class="task-table">
+        <thead><tr><th>#</th><th>Title</th><th>Type</th><th>Customer</th><th>Priority</th><th>Status</th><th>Assigned</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--muted)">#041</td><td>Payment timeout on GPRS network<br><small style="color:var(--muted)">v2.4.1 · PAX A920</small></td><td><span class="badge bug">Bug</span></td><td>Sadad Bank</td><td><span class="badge critical">Critical</span></td><td><span class="badge inprog">In Progress</span></td><td>hiva</td></tr>
+          <tr><td style="color:var(--muted)">#040</td><td>Request for batch settlement report</td><td><span class="badge dev">Feature</span></td><td>PEP</td><td><span class="badge medium">Medium</span></td><td><span class="badge todo">Open</span></td><td>ali</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DEPLOYMENTS PANEL -->
+    <div id="panel-deployments" class="panel-section">
+      <div class="toolbar">
+        <button class="btn btn-teal">+ New Release</button>
+        <input type="text" placeholder="Search version…">
+      </div>
+      <table class="task-table">
+        <thead><tr><th>Version</th><th>Product</th><th>Type</th><th>Status</th><th>QC</th><th>Tasks</th><th>Release Date</th></tr></thead>
+        <tbody>
+          <tr><td><strong>v3.0.0</strong></td><td>POS Firmware</td><td><span class="badge critical" style="background:rgba(74,144,217,0.15);color:var(--blue)">Major</span></td><td><span class="badge inprog">In QC</span></td><td><a style="color:var(--teal);font-size:11px">3 tests ↗</a></td><td><a style="color:var(--teal);font-size:11px">5 tasks ↗</a></td><td style="color:var(--muted)">TBD</td></tr>
+          <tr><td><strong>v2.4.2</strong></td><td>POS Firmware</td><td><span class="badge medium">Patch</span></td><td><span class="badge done">Released</span></td><td><a style="color:var(--teal);font-size:11px">2 tests ↗</a></td><td><a style="color:var(--teal);font-size:11px">3 tasks ↗</a></td><td>1404/01/05</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DELIVERY PANEL -->
+    <div id="panel-delivery" class="panel-section">
+      <div class="toolbar">
+        <button class="btn btn-teal">+ Create Delivery Letter</button>
+      </div>
+      <table class="task-table">
+        <thead><tr><th>Delivery #</th><th>Version</th><th>Customer</th><th>Status</th><th>Sent</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td>#DL-014</td><td>v2.4.2</td><td>Sadad Bank</td><td><span class="badge done">Sent</span></td><td>1404/01/06 · email</td><td><button class="btn" style="font-size:10px;padding:3px 8px">View Letter</button></td></tr>
+          <tr><td>#DL-015</td><td>v2.4.2</td><td>PEP</td><td><span class="badge high">Draft</span></td><td>—</td><td><button class="btn btn-teal" style="font-size:10px;padding:3px 8px">Generate</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- KNOWLEDGE PANEL -->
+    <div id="panel-knowledge" class="panel-section">
+      <div class="toolbar">
+        <button class="btn btn-teal">+ New Article</button>
+        <input type="text" placeholder="Search articles…">
+        <span class="filter-tag on">All</span><span class="filter-tag">QC</span><span class="filter-tag">Dev</span><span class="filter-tag">Setup</span>
+      </div>
+      <table class="task-table">
+        <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Views</th><th>Updated</th></tr></thead>
+        <tbody>
+          <tr><td><a style="color:var(--teal)">PAX A920 QC Checklist — EMV & NFC</a></td><td><span class="badge qc">QC</span></td><td>hiva</td><td>42</td><td>1404/01/08</td></tr>
+          <tr><td><a style="color:var(--teal)">SDK Integration Guide v3.0</a></td><td><span class="badge dev">Dev</span></td><td>ali</td><td>18</td><td>1404/01/10</td></tr>
+          <tr><td><a style="color:var(--teal)">VPS Setup & pm2 Deployment</a></td><td><span class="badge medium">Setup</span></td><td>saeed</td><td>9</td><td>1404/01/01</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- REPORTS PANEL -->
+    <div id="panel-reports" class="panel-section">
+      <div class="kpi-row">
+        <div class="kpi total"><div class="label">Tasks Closed</div><div class="val">87</div><div class="sub">this month</div></div>
+        <div class="kpi done"><div class="label">QC Pass Rate</div><div class="val">77%</div><div class="sub">last 30 days</div></div>
+        <div class="kpi prog"><div class="label">Open Issues</div><div class="val">12</div><div class="sub">active</div></div>
+        <div class="kpi high"><div class="label">Avg Resolution</div><div class="val">3.2d</div><div class="sub">issues</div></div>
+        <div class="kpi critical"><div class="label">Failed Deploys</div><div class="val">1</div><div class="sub">this month</div></div>
+      </div>
+      <!-- Simple SVG bar chart -->
+      <div style="background:var(--bg2);border:1px solid var(--border);padding:16px;margin-top:4px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Tasks Completed — Last 6 Weeks</div>
+        <svg width="100%" height="100" viewBox="0 0 600 100">
+          <g fill="var(--teal)" opacity="0.8">
+            <rect x="20"  y="40" width="60" height="55" rx="2"/>
+            <rect x="110" y="25" width="60" height="70" rx="2"/>
+            <rect x="200" y="50" width="60" height="45" rx="2"/>
+            <rect x="290" y="10" width="60" height="85" rx="2"/>
+            <rect x="380" y="30" width="60" height="65" rx="2"/>
+            <rect x="470" y="20" width="60" height="75" rx="2"/>
+          </g>
+          <g fill="var(--muted)" font-size="10" text-anchor="middle" font-family="monospace">
+            <text x="50"  y="98">W1</text><text x="140" y="98">W2</text>
+            <text x="230" y="98">W3</text><text x="320" y="98">W4</text>
+            <text x="410" y="98">W5</text><text x="500" y="98">W6</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+  </div><!-- end #panel -->
+</div><!-- end #main -->
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-head">Notifications (3 unread)</div>
+  <div class="notif-item unread">
+    <div class="ntitle">QC Test failed — PAX A910 batch B-042</div>
+    <div class="nmeta">QC Module · 2 tasks auto-created · 10 min ago</div>
+  </div>
+  <div class="notif-item unread">
+    <div class="ntitle">Issue #041 assigned to you</div>
+    <div class="nmeta">Issues · Critical priority · 1 hour ago</div>
+  </div>
+  <div class="notif-item unread">
+    <div class="ntitle">Sprint reset scheduled for Saturday</div>
+    <div class="nmeta">Sprint · Admin notice · 3 hours ago</div>
+  </div>
+  <div class="notif-item">
+    <div class="ntitle">Delivery letter #DL-014 sent to Sadad Bank</div>
+    <div class="nmeta">Delivery · Email confirmed · yesterday</div>
+  </div>
+</div>
+
+<script>
+const panelNames = {
+  sprint:'Sprint Board', assets:'Asset Inventory', qc:'QC Tests',
+  issues:'Issues', deployments:'Deployments', delivery:'Delivery Letters',
+  knowledge:'Knowledge Base', reports:'Reports & Analytics'
+};
+function showPanel(name) {
+  document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('topbar-title').textContent = panelNames[name];
+  event.currentTarget.classList.add('active');
+  document.getElementById('notif-panel').classList.remove('open');
+}
+function switchTab(el, targetId) {
+  const sprint = document.getElementById('panel-sprint');
+  sprint.querySelectorAll('[id^="sprint-"]').forEach(t => t.style.display='none');
+  sprint.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(targetId).style.display = 'block';
+  el.classList.add('active');
+}
+function toggleTheme() {
+  const h = document.documentElement;
+  h.setAttribute('data-theme', h.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
+}
+function toggleLang() { alert('Language toggle: Persian / English'); }
+function toggleNotif() {
+  document.getElementById('notif-panel').classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -15,13 +15,14 @@
 <style>
 :root{--teal:#00928A;--teal-dim:#007a73;--teal-glass:rgba(0,146,138,0.13);--teal-border:rgba(0,146,138,0.35);--bg:#1a1a1a;--bg2:#222;--bg3:#2a2a2a;--surface:#272727;--surface2:#313131;--border:rgba(255,255,255,0.08);--text:#e8e6e6;--dim:#9a9898;--muted:#5e5c5c;--green:#2DA771;--orange:#E8A838;--red:#D94F3D;--blue:#4A90D9;--shadow:rgba(0,0,0,0.3);--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;}
 [data-theme=light]{--bg:#f0f0f0;--bg2:#e8e8e8;--bg3:#fff;--surface:#fff;--surface2:#f5f5f5;--border:rgba(0,0,0,0.1);--text:#1e1e1e;--dim:#555;--muted:#999;--shadow:rgba(0,0,0,0.1);}
+[dir="rtl"]{--sans:Tahoma,sans-serif;--mono:Tahoma,sans-serif;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.25s,color 0.25s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;gap:8px;}
 .logo{display:flex;align-items:center;gap:9px;flex-shrink:0;}
-.logo-mark{width:28px;height:28px;background:var(--teal);clip-path:polygon(0 0,70% 0,100% 30%,100% 100%,30% 100%,0 70%);flex-shrink:0;}
-.logo-text{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:0.08em;}
+.logo-text{font-family:var(--mono);font-weight:700;font-size:22px;letter-spacing:0.08em;color:#fff;}
 .logo-text span{color:var(--teal);}
+.logo-sub{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,0.75);letter-spacing:0.04em;}
 .shamsi-hdr{font-family:var(--mono);font-size:11px;color:var(--teal);background:var(--teal-glass);border:1px solid var(--teal-border);padding:4px 11px;border-radius:6px;white-space:nowrap;}
 .topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .admin-badge{font-family:var(--mono);font-size:9px;color:var(--orange);background:rgba(232,168,56,0.1);border:1px solid rgba(232,168,56,0.3);padding:3px 9px;border-radius:5px;}
@@ -38,7 +39,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .sb-label{color:var(--muted);}
 .tabs{display:flex;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:12px 16px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.tab{font-family:var(--mono);font-size:11px;letter-spacing:0.06em;padding:13px 18px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
 .tab:hover{color:var(--text);}
 .tab.active{color:var(--teal);border-bottom-color:var(--teal);}
 .main{padding:16px;}
@@ -228,6 +229,13 @@ select option{background:var(--surface);}
 .mftr{display:flex;justify-content:flex-end;gap:8px;padding:13px 18px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--bg3);}
 .btn-cancel{background:none;border:1px solid var(--border);color:var(--dim);padding:9px 16px;font-family:var(--mono);font-size:10px;cursor:pointer;border-radius:6px;}
 .btn-save{background:var(--teal);border:none;color:#fff;padding:9px 18px;font-family:var(--mono);font-size:10px;letter-spacing:0.05em;cursor:pointer;border-radius:6px;text-transform:uppercase;}
+.settings-box{max-width:400px;}.settings-box h3{font-size:15px;font-weight:500;margin-bottom:18px;}
+.pfield{margin-bottom:14px;}.pfield label{display:block;margin-bottom:6px;}
+.pfield input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:11px 13px;font-family:var(--sans);font-size:14px;border-radius:6px;outline:none;width:100%;}
+.pfield input:focus{border-color:var(--teal);}
+#adm_pinMsg{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--teal);}
+.act.inactive{border-color:var(--orange);color:var(--orange);}
+.user-inactive{opacity:0.5;}
 .acard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
 .acard-title{font-family:var(--mono);font-size:9px;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .srow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);gap:6px;}
@@ -243,7 +251,7 @@ select option{background:var(--surface);}
 </head>
 <body>
 <div class="topbar">
-  <div class="logo"><div class="logo-mark"></div><div class="logo-text">PEA<span>VA</span></div></div>
+  <div class="logo"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><polygon points="18,2 32,10 32,26 18,34 4,26 4,10" stroke="#00928A" stroke-width="2"/><polygon points="18,8 27,13 27,23 18,28 9,23 9,13" fill="#00928A" opacity="0.45"/></svg><div><div class="logo-text">PEA<span>VA</span></div><div class="logo-sub">Admin Panel</div></div></div>
   <div class="shamsi-hdr" id="shamsiHdr">—</div>
   <div class="topbar-right">
     <div class="admin-badge">ADMIN</div>
@@ -260,6 +268,7 @@ select option{background:var(--surface);}
   <div class="tab" onclick="switchTab('archive')"  id="tab-archive">Archive</div>
   <div class="tab" onclick="switchTab('users')"    id="tab-users">Users</div>
   <div class="tab" onclick="switchTab('teams')"    id="tab-teams">Teams</div>
+  <div class="tab" onclick="switchTab('settings')" id="tab-settings">⚙️ Settings</div>
 </div>
 
 <!-- OVERVIEW -->
@@ -360,6 +369,20 @@ select option{background:var(--surface);}
   </div>
 </div>
 
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="main">
+    <div class="settings-box">
+      <h3>Change PIN</h3>
+      <div class="pfield"><label>Current PIN</label><input type="password" id="adm_oldPin" placeholder="Current PIN"></div>
+      <div class="pfield"><label>New PIN (min 4 digits)</label><input type="password" id="adm_newPin" placeholder="New PIN"></div>
+      <div class="pfield"><label>Confirm New PIN</label><input type="password" id="adm_confirmPin" placeholder="Confirm PIN"></div>
+      <button class="btn-save" onclick="adminChangePin()">Update PIN</button>
+      <div id="adm_pinMsg"></div>
+    </div>
+  </div>
+</div>
+
 <!-- TASK MODAL -->
 <div class="overlay" id="taskOverlay">
   <div class="modal">
@@ -441,7 +464,7 @@ select option{background:var(--surface);}
 var allTasks=[],allUsers=[],allTeams=[],filters={team:'',member:'',status:'',priority:''};
 var taskEditId=null,userEditId=null,teamEditId=null,selectedIds={},commentTaskId=null;
 var searchMode=false,searchResults=[];
-var lang=localStorage.getItem('pea-lang')||'en';
+var lang=localStorage.getItem('pea-lang')||'fa';
 var theme=localStorage.getItem('pea-theme')||'dark';
 document.documentElement.setAttribute('data-theme',theme);
 document.getElementById('themeBtn').textContent=theme==='dark'?'☀️':'🌙';
@@ -745,8 +768,11 @@ async function delComment(id){await fetch('/api/tasks/'+commentTaskId+'/comments
 // USERS
 function renderUsers(){
   document.getElementById('userGrid').innerHTML=allUsers.filter(function(u){return u.role!=='admin';}).map(function(u){
-    return '<div class="user-card"><div class="user-name-big">'+u.name+'</div><div class="user-meta">@'+u.username+'</div><div class="user-team">'+teamName(u.teamId)+'</div>'
-      +'<div class="user-actions"><button class="act" onclick="openUserEdit(\''+u.id+'\')">Edit</button><button class="act del" onclick="delUser(\''+u.id+'\')">Delete</button></div></div>';
+    var inactive=u.active===false;
+    return '<div class="user-card'+(inactive?' user-inactive':'')+'"><div class="user-name-big">'+u.name+(inactive?' <span style="font-size:9px;color:var(--orange);font-family:var(--mono)">[inactive]</span>':'')+'</div><div class="user-meta">@'+u.username+'</div><div class="user-team">'+teamName(u.teamId)+'</div>'
+      +'<div class="user-actions"><button class="act" onclick="openUserEdit(\''+u.id+'\')">Edit</button>'
+      +(inactive?'<button class="act" onclick="setUserActive(\''+u.id+'\',true)">Reactivate</button>':'<button class="act inactive" onclick="setUserActive(\''+u.id+'\',false)">Deactivate</button>')
+      +'<button class="act del" onclick="delUser(\''+u.id+'\')">Delete</button></div></div>';
   }).join('');
 }
 function openUserModal(){userEditId=null;document.getElementById('userModalTitle').textContent='New User';['fu_name','fu_username','fu_pin'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('fu_role').value='member';document.getElementById('pinHint').style.display='none';var ts=document.getElementById('fu_team');ts.innerHTML='<option value="">No Team</option>';allTeams.forEach(function(t){ts.innerHTML+='<option value="'+t.id+'">'+t.name+'</option>';});document.getElementById('userOverlay').classList.add('open');}
@@ -773,7 +799,7 @@ async function loadArchiveTab(){
 }
 
 function switchTab(tab){
-  var tabs=['overview','tasks','kanban','archive','users','teams'];
+  var tabs=['overview','tasks','kanban','archive','users','teams','settings'];
   document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',tabs[i]===tab);});
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page-'+tab).classList.add('active');
@@ -785,6 +811,24 @@ function switchTab(tab){
 }
 
 async function logout(){await fetch('/api/auth/logout',{method:'POST'});window.location.href='/';}
+
+async function adminChangePin(){
+  var old=document.getElementById('adm_oldPin').value;
+  var np=document.getElementById('adm_newPin').value;
+  var cp=document.getElementById('adm_confirmPin').value;
+  var msg=document.getElementById('adm_pinMsg');
+  if(np!==cp){msg.style.color='var(--red)';msg.textContent='PINs do not match';return;}
+  var r=await fetch('/api/auth/change-pin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPin:old,newPin:np})});
+  var d=await r.json();
+  msg.style.color=r.ok?'var(--teal)':'var(--red)';
+  msg.textContent=r.ok?'✓ PIN updated':(d.error||'Error');
+}
+
+async function setUserActive(id,active){
+  await fetch('/api/users/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:active})});
+  await loadUsers();renderUsers();
+}
+
 init();
 </script>
 </body>

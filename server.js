@@ -369,7 +369,7 @@ async function router(req, res) {
   if (M==='POST' && P==='/api/auth/login') {
     var b=await getBody(req);
     var user=readDB('users').find(function(u){return u.username===(b.username||'').toLowerCase().trim();});
-    if(!user||user.pin!==hashPin(String(b.pin||''))) return send(res,401,{error:'Invalid credentials'});
+    if(!user||user.pin!==hashPin(String(b.pin||''))||user.active===false) return send(res,401,{error:'Invalid credentials'});
     var sid=genSid(), sessions=readObj('sessions');
     sessions[sid]={userId:user.id,role:user.role,teamId:user.teamId,name:user.name,username:user.username,at:Date.now()};
     writeObj('sessions',sessions);

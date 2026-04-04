@@ -1,113 +1,270 @@
 <style>
-/* ── Sprint panel local styles ──────────────────────────────── */
-#sprint-panel { display:flex; flex-direction:column; gap:16px; }
+/* ══ Sprint panel ══════════════════════════════════════════════ */
+#sprint-panel { display:flex; flex-direction:column; gap:14px; }
 
-/* Summary bar */
+/* ── Summary bar ─────────────────────────────────────────────── */
 .sprint-summary { display:flex; gap:12px; flex-wrap:wrap; }
 .sprint-kpi {
-  flex:1; min-width:110px;
-  background:var(--bg); border-radius:var(--radius-sm); padding:12px 16px;
+  flex:1; min-width:120px; border-radius:14px; padding:14px 18px;
+  background:var(--bg);
+  box-shadow:6px 6px 12px var(--shadow-d),-6px -6px 12px var(--shadow-l);
+  display:flex; flex-direction:column; gap:4px;
+}
+.sk-icon  { font-size:1.3rem; line-height:1; }
+.sk-val   { font-size:1.8rem; font-weight:700; color:var(--text); line-height:1; }
+.sk-label { font-size:.68rem; font-weight:600; text-transform:uppercase; letter-spacing:.9px; color:var(--muted); }
+.sprint-kpi.kpi-done  .sk-val { color:var(--success); }
+.sprint-kpi.kpi-prog  .sk-val { color:var(--teal); }
+.sprint-kpi.kpi-over  .sk-val { color:var(--danger); }
+.sprint-kpi.kpi-total .sk-val { color:var(--text); }
+
+/* Sprint calendar widget */
+#sprint-cal {
+  border-radius:14px; padding:14px 18px;
+  background:var(--bg);
+  box-shadow:6px 6px 12px var(--shadow-d),-6px -6px 12px var(--shadow-l);
+  min-width:180px; flex-shrink:0;
+}
+#sprint-cal .cal-title  { font-size:.65rem; font-weight:700; letter-spacing:.9px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+#sprint-cal .cal-dates  { font-size:.75rem; color:var(--text-sub); margin-bottom:8px; display:flex; justify-content:space-between; }
+#sprint-cal .cal-remain { font-size:.72rem; color:var(--teal); font-weight:600; margin-bottom:8px; }
+.sprint-prog-wrap { height:7px; background:rgba(0,0,0,.08); border-radius:4px;
+  box-shadow:inset 2px 2px 4px var(--shadow-d),inset -2px -2px 4px var(--shadow-l); }
+.sprint-prog-fill { height:7px; background:linear-gradient(90deg,var(--teal),var(--blue)); border-radius:4px; transition:width .5s; }
+.sprint-prog-lbl  { font-size:.66rem; color:var(--muted); margin-top:4px; text-align:right; }
+
+/* ── Filters row ─────────────────────────────────────────────── */
+.sprint-filters-row {
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  background:var(--bg); border-radius:12px; padding:10px 14px;
+  box-shadow:inset 3px 3px 6px var(--shadow-d),inset -3px -3px 6px var(--shadow-l);
+}
+.sprint-filters-row select.input,
+.sprint-filters-row .input {
+  flex:1; min-width:110px; max-width:160px;
+  padding:6px 10px; font-size:.78rem; height:32px;
+  border-radius:8px; box-shadow:3px 3px 6px var(--shadow-d),-3px -3px 6px var(--shadow-l);
+  border:none; background:var(--bg); color:var(--text);
+}
+.sprint-filters-row .filter-search {
+  flex:2; min-width:140px; max-width:240px;
+}
+.sprint-filters-row .filter-spacer { flex:1; }
+
+/* ── Table ───────────────────────────────────────────────────── */
+.sprint-table { border-collapse:separate; border-spacing:0; width:100%; }
+.sprint-table thead th {
+  background:var(--bg); font-size:.68rem; font-weight:700; letter-spacing:.6px;
+  text-transform:uppercase; color:var(--muted); padding:10px 12px;
+  border-bottom:2px solid rgba(0,0,0,.07); position:sticky; top:0; z-index:1;
+}
+.sprint-table tbody tr {
+  border-bottom:1px solid rgba(0,0,0,.05);
+  transition:background .1s;
+}
+.sprint-table tbody tr:hover { background:rgba(0,0,0,.018); }
+.sprint-table tbody tr:last-child td { border-bottom:none; }
+.sprint-table tbody td { padding:10px 12px; font-size:.82rem; vertical-align:middle; }
+.sprint-table .task-title { font-size:.86rem; color:var(--text); line-height:1.4; }
+.sprint-table .task-meta  { font-size:.71rem; color:var(--muted); margin-top:2px; }
+.sprint-table .row-selected td { background:rgba(0,146,138,.05); }
+
+/* Overdue indicator */
+.overdue-title { color:var(--danger) !important; font-weight:700 !important; }
+.overdue-badge { font-size:.68rem; color:var(--danger); font-weight:700; margin-left:4px; }
+
+/* Deadline cell */
+.deadline-date { font-size:.78rem; }
+.deadline-date.overdue { color:var(--danger); font-weight:700; }
+
+/* Progress bar (inline in task cell) */
+.pct-bar { height:3px; background:rgba(0,0,0,.07); border-radius:2px; margin-top:5px; width:100%; max-width:160px; }
+.pct-fill{ height:3px; background:var(--teal); border-radius:2px; transition:width .3s; }
+
+/* Action buttons — icon style */
+.col-actions { white-space:nowrap; }
+.act-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:8px; font-size:.8rem;
+  background:var(--bg); border:none; cursor:pointer; color:var(--muted);
+  box-shadow:2px 2px 5px var(--shadow-d),-2px -2px 5px var(--shadow-l);
+  transition:all .12s; margin:0 1px;
+}
+.act-btn:hover { color:var(--teal); box-shadow:3px 3px 7px var(--shadow-d),-3px -3px 7px var(--shadow-l); }
+.act-btn.danger:hover { color:var(--danger); }
+.act-btn:active { box-shadow:inset 2px 2px 4px var(--shadow-d),inset -2px -2px 4px var(--shadow-l); }
+
+/* Priority dot */
+.pri-dot { width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;flex-shrink:0; }
+.pri-dot.critical{background:var(--danger);} .pri-dot.high{background:var(--warning);}
+.pri-dot.medium{background:var(--blue);}     .pri-dot.low{background:var(--muted);}
+
+/* Bulk bar */
+.bulk-bar {
+  display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  background:var(--bg); border-radius:10px; padding:8px 14px;
+  box-shadow:3px 3px 6px var(--shadow-d),-3px -3px 6px var(--shadow-l);
+  font-size:.8rem;
+}
+
+/* ── Kanban ───────────────────────────────────────────────────── */
+.kanban-board { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+.kanban-col {
+  background:var(--bg); border-radius:14px; overflow:hidden;
   box-shadow:5px 5px 10px var(--shadow-d),-5px -5px 10px var(--shadow-l);
 }
-.sprint-kpi .sk-label { font-size:.65rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
-.sprint-kpi .sk-val   { font-size:1.6rem; font-weight:700; margin:2px 0; color:var(--text); }
-.sprint-kpi .sk-sub   { font-size:.7rem; color:var(--muted); }
-.sprint-kpi.c-teal   .sk-val { color:var(--teal); }
-.sprint-kpi.c-danger .sk-val { color:var(--danger); }
-.sprint-kpi.c-warn   .sk-val { color:var(--warning); }
-.sprint-kpi.c-blue   .sk-val { color:var(--blue); }
-.sprint-kpi.c-green  .sk-val { color:var(--success); }
-
-/* Table */
-.sprint-table th:first-child, .sprint-table td:first-child { width:36px; }
-.sprint-table .task-title { font-size:.87rem; color:var(--text); max-width:260px; }
-.sprint-table .task-meta  { font-size:.72rem; color:var(--muted); margin-top:2px; }
-.pct-bar { height:5px; background:rgba(0,0,0,.08); border-radius:3px; margin-top:4px; }
-.pct-fill{ height:5px; background:var(--teal); border-radius:3px; transition:width .3s; }
-
-/* Priority color dot */
-.pri-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:5px; flex-shrink:0; }
-.pri-dot.critical { background:var(--danger); }
-.pri-dot.high     { background:var(--warning); }
-.pri-dot.medium   { background:var(--blue); }
-.pri-dot.low      { background:var(--muted); }
-
-/* Kanban */
-.kanban-board { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
-.kanban-col { background:var(--bg); border-radius:var(--radius); overflow:hidden;
-  box-shadow:5px 5px 10px var(--shadow-d),-5px -5px 10px var(--shadow-l); }
-.kanban-col-head { padding:12px 16px; display:flex; justify-content:space-between; align-items:center;
-  border-bottom:2px solid rgba(0,0,0,.06); font-size:.82rem; font-weight:600; }
-.kanban-col-head .kcol-count { font-size:.72rem; background:var(--bg3,#e8edf4); padding:2px 8px;
-  border-radius:10px; box-shadow:2px 2px 4px var(--shadow-d),-2px -2px 4px var(--shadow-l); }
-.kanban-body { padding:10px; display:flex; flex-direction:column; gap:8px; min-height:160px; }
+.kanban-col-head {
+  padding:12px 16px; display:flex; justify-content:space-between; align-items:center;
+  border-bottom:2px solid rgba(0,0,0,.05); font-size:.82rem; font-weight:700;
+}
+.kanban-col-head.col-todo  { border-top:3px solid var(--blue); }
+.kanban-col-head.col-prog  { border-top:3px solid var(--teal); }
+.kanban-col-head.col-done  { border-top:3px solid var(--success); }
+.kcol-count {
+  font-size:.72rem; background:var(--bg); padding:2px 8px; border-radius:10px;
+  box-shadow:2px 2px 4px var(--shadow-d),-2px -2px 4px var(--shadow-l);
+}
+.kanban-body { padding:10px; display:flex; flex-direction:column; gap:8px; min-height:120px; }
 .kcard {
-  background:var(--bg); border-radius:var(--radius-sm); padding:11px 13px;
+  background:var(--bg); border-radius:10px; padding:11px 13px;
   cursor:pointer; border-left:3px solid transparent;
   box-shadow:3px 3px 6px var(--shadow-d),-3px -3px 6px var(--shadow-l);
-  transition:box-shadow .15s;
+  transition:box-shadow .12s;
 }
 .kcard:hover { box-shadow:5px 5px 10px var(--shadow-d),-5px -5px 10px var(--shadow-l); }
-.kcard.pri-Critical { border-left-color:var(--danger); }
-.kcard.pri-High     { border-left-color:var(--warning); }
-.kcard.pri-Medium   { border-left-color:var(--blue); }
-.kcard.pri-Low      { border-left-color:var(--muted); }
-.kcard-title { font-size:.84rem; margin-bottom:6px; color:var(--text); }
-.kcard-meta  { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.kcard.pri-Critical{border-left-color:var(--danger);}  .kcard.pri-High{border-left-color:var(--warning);}
+.kcard.pri-Medium{border-left-color:var(--blue);}       .kcard.pri-Low{border-left-color:var(--muted);}
+.kcard-title { font-size:.83rem; margin-bottom:6px; color:var(--text); line-height:1.3; }
+.kcard-meta  { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
 .kanban-compact .kcard-meta { display:none; }
 .kanban-compact .kcard { padding:7px 10px; }
 
-/* Analysis */
+/* ── Analysis ─────────────────────────────────────────────────── */
+.analysis-top { display:flex; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.analysis-sprint-progress {
+  flex:1; min-width:180px; background:var(--bg); border-radius:14px; padding:18px 20px;
+  box-shadow:5px 5px 10px var(--shadow-d),-5px -5px 10px var(--shadow-l);
+}
+.analysis-sprint-progress h4 { font-size:.72rem; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+.analysis-sprint-progress .spr-stat { display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:10px; }
+.analysis-sprint-progress .spr-stat strong { color:var(--teal); font-size:1.2rem; }
+.ana-prog-wrap { height:12px; background:rgba(0,0,0,.08); border-radius:6px;
+  box-shadow:inset 2px 2px 5px var(--shadow-d),inset -2px -2px 5px var(--shadow-l); margin-bottom:6px; }
+.ana-prog-fill { height:12px; border-radius:6px; background:linear-gradient(90deg,var(--teal),var(--blue)); transition:width .5s; }
+.ana-prog-lbl { font-size:.7rem; color:var(--muted); text-align:right; }
+
 .analysis-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.analysis-card { background:var(--bg); border-radius:var(--radius); padding:18px;
-  box-shadow:5px 5px 10px var(--shadow-d),-5px -5px 10px var(--shadow-l); }
-.analysis-card h4 { font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.8px;
-  color:var(--muted); margin-bottom:12px; }
-.bar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:.8rem; }
-.bar-label { min-width:90px; color:var(--text-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.bar-wrap  { flex:1; height:8px; background:rgba(0,0,0,.07); border-radius:4px;
+.analysis-card {
+  background:var(--bg); border-radius:14px; padding:18px 20px;
+  box-shadow:5px 5px 10px var(--shadow-d),-5px -5px 10px var(--shadow-l);
+}
+.analysis-card h4 { font-size:.72rem; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:14px; }
+
+/* Donut chart */
+.donut-wrap { display:flex; align-items:center; gap:20px; }
+.donut-legend { display:flex; flex-direction:column; gap:7px; }
+.donut-leg-item { display:flex; align-items:center; gap:7px; font-size:.78rem; }
+.donut-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* Bar chart */
+.bar-row { display:flex; align-items:center; gap:8px; margin-bottom:9px; font-size:.78rem; }
+.bar-label { min-width:80px; max-width:100px; color:var(--text-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:.75rem; }
+.bar-wrap  { flex:1; height:10px; background:rgba(0,0,0,.07); border-radius:5px;
   box-shadow:inset 2px 2px 4px var(--shadow-d),inset -2px -2px 4px var(--shadow-l); }
-.bar-fill  { height:8px; background:var(--teal); border-radius:4px; transition:width .4s; }
-.bar-count { min-width:28px; text-align:right; color:var(--muted); font-size:.75rem; }
-.bar-pct   { min-width:36px; text-align:right; color:var(--muted); font-size:.72rem; }
-.pri-row   { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid rgba(0,0,0,.05); }
+.bar-fill  { height:10px; border-radius:5px; transition:width .4s; background:var(--teal); }
+.bar-count { min-width:24px; text-align:right; color:var(--muted); font-size:.72rem; font-weight:600; }
+
+/* Priority rows */
+.pri-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(0,0,0,.05); font-size:.8rem; }
 .pri-row:last-child { border-bottom:none; }
 
-/* Archive */
-.archive-note { font-size:.8rem; color:var(--muted); padding:8px 0; }
+/* ── Archive ──────────────────────────────────────────────────── */
+.archive-note { font-size:.78rem; color:var(--muted); padding:6px 0 10px; }
 
+/* ── Comments ─────────────────────────────────────────────────── */
+.comment-item { padding:10px 0; border-bottom:1px solid rgba(0,0,0,.06); }
+.comment-item:last-child { border-bottom:none; }
+.comment-meta { display:flex; align-items:center; gap:8px; margin-bottom:5px; font-size:.74rem; }
+.comment-meta strong { color:var(--text); }
+.comment-meta .cmt-time { color:var(--muted); flex:1; }
+.comment-body { font-size:.82rem; color:var(--text-sub); line-height:1.5; white-space:pre-wrap; }
+
+/* ── Modal refinements ────────────────────────────────────────── */
+.modal { background:var(--bg); border-radius:var(--radius); max-width:560px; width:95%;
+  box-shadow:12px 12px 24px var(--shadow-d),-8px -8px 20px var(--shadow-l); }
+.modal-body .form-divider { height:1px; background:rgba(0,0,0,.06); margin:12px 0; }
+.modal-section-label { font-size:.62rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:block; }
+
+/* ── Mobile responsive ────────────────────────────────────────── */
 @media(max-width:900px){
-  .kanban-board { grid-template-columns:1fr; }
-  .analysis-grid { grid-template-columns:1fr; }
-  .sprint-summary .sprint-kpi { min-width:80px; }
-  .sprint-table .hide-mobile { display:none !important; }
+  .kanban-board       { grid-template-columns:1fr; }
+  .analysis-grid      { grid-template-columns:1fr; }
+  .sprint-summary     { gap:8px; }
+  .sprint-kpi         { min-width:80px; padding:10px 12px; }
+  .sk-val             { font-size:1.4rem; }
+  #sprint-cal         { min-width:100%; }
+  .hide-mobile        { display:none !important; }
+  .sprint-filters-row { gap:6px; }
+  .sprint-filters-row select.input,
+  .sprint-filters-row .input { min-width:0; max-width:none; }
+  .table-wrap         { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .sprint-table       { min-width:600px; }
+}
+@media(max-width:600px){
+  .sprint-summary     { flex-wrap:wrap; }
+  .sprint-kpi         { flex-basis:calc(50% - 8px); }
 }
 </style>
 
 <div id="sprint-panel">
 
-  <!-- Summary bar -->
-  <div class="sprint-summary" id="sprint-summary"></div>
-
-  <!-- Tabs -->
-  <div class="tabs" id="sprint-tabs">
-    <div class="tab active" data-tab="tasks"    onclick="sprintTab(this,'tasks')">Tasks</div>
-    <div class="tab"        data-tab="kanban"   onclick="sprintTab(this,'kanban')">Kanban</div>
-    <div class="tab"        data-tab="analysis" onclick="sprintTab(this,'analysis')">Analysis</div>
-    <div class="tab"        data-tab="archive"  onclick="sprintTab(this,'archive')">Archive</div>
+  <!-- ── Summary bar + Sprint Calendar ─────────────────────────── -->
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:stretch">
+    <div class="sprint-summary" id="sprint-summary" style="flex:1;min-width:0"></div>
+    <div id="sprint-cal"></div>
   </div>
 
-  <!-- ── TASKS TAB ────────────────────────────────────────────────────── -->
+  <!-- ── Tabs ──────────────────────────────────────────────────── -->
+  <div class="tabs" id="sprint-tabs">
+    <div class="tab active" data-tab="tasks"    onclick="sprintTab(this,'tasks')">📋 Tasks</div>
+    <div class="tab"        data-tab="kanban"   onclick="sprintTab(this,'kanban')">🗂 Kanban</div>
+    <div class="tab"        data-tab="analysis" onclick="sprintTab(this,'analysis')">📊 Analysis</div>
+    <div class="tab"        data-tab="archive"  onclick="sprintTab(this,'archive')">📦 Archive</div>
+  </div>
+
+  <!-- ══ TASKS TAB ═══════════════════════════════════════════════ -->
   <div id="tab-tasks" class="sprint-tab">
-    <div class="toolbar">
-      <button class="btn btn-primary btn-sm" onclick="sprintOpenModal()">+ New Task</button>
-      <input  id="sprint-search" class="input" style="max-width:200px;padding:6px 12px"
-              placeholder="Search tasks…" oninput="sprintSearch(this.value)">
-      <div id="sprint-filters" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-      <div class="toolbar-right">
-        <button class="btn btn-sm" onclick="sprintExport()" title="Export XLSX">↓ Excel</button>
-        <button class="btn btn-sm" id="btn-reset-sprint" onclick="sprintReset()" style="display:none">↺ Reset Sprint</button>
-      </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar" style="margin-bottom:8px">
+      <button class="btn btn-primary btn-sm" onclick="sprintOpenModal()">+ <span class="s-new-task">New Task</span></button>
+      <div style="flex:1"></div>
+      <button class="btn btn-sm" onclick="sprintExport()" title="Export XLSX">↓ Excel</button>
+      <button class="btn btn-sm" id="btn-reset-sprint" onclick="sprintReset()" style="display:none">↺ Reset</button>
+    </div>
+
+    <!-- Filter row -->
+    <div class="sprint-filters-row">
+      <input class="input filter-search" id="sprint-search" placeholder="🔍 Search…" oninput="sprintSearch(this.value)">
+      <select class="input" id="filter-member"   onchange="sprintFilterSel('member',this.value)">
+        <option value="">👤 All Members</option>
+      </select>
+      <select class="input" id="filter-customer" onchange="sprintFilterSel('customer',this.value)">
+        <option value="">🏢 All Customers</option>
+      </select>
+      <select class="input" id="filter-status"   onchange="sprintFilterSel('status',this.value)">
+        <option value="">● All Status</option>
+        <option value="To Do">To Do</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+      </select>
+      <select class="input" id="filter-priority" onchange="sprintFilterSel('priority',this.value)">
+        <option value="">⬆ All Priority</option>
+        <option value="Critical">🔴 Critical</option>
+        <option value="High">🟠 High</option>
+        <option value="Medium">🔵 Medium</option>
+        <option value="Low">⚪ Low</option>
+      </select>
     </div>
 
     <!-- Bulk action bar -->
@@ -122,26 +279,24 @@
         <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
       </select>
       <button class="btn btn-primary btn-xs" onclick="sprintBulkApply()">Apply</button>
-      <button class="btn btn-xs" onclick="sprintClearSelection()">Clear</button>
+      <button class="btn btn-xs" onclick="sprintClearSelection()">✕ Clear</button>
     </div>
 
-    <!-- Desktop table -->
+    <!-- Table -->
     <div class="table-wrap" id="sprint-table-wrap">
       <table class="table sprint-table">
         <thead>
           <tr>
-            <th class="col-check"><input type="checkbox" class="checkbox" id="sprint-chk-all" onchange="sprintSelectAll(this)"></th>
-            <th>#</th>
+            <th style="width:32px"><input type="checkbox" class="checkbox" id="sprint-chk-all" onchange="sprintSelectAll(this)"></th>
+            <th style="width:32px">#</th>
             <th>Assigned</th>
             <th>Task</th>
             <th class="hide-mobile">Customer</th>
-            <th class="hide-mobile">Version</th>
             <th class="hide-mobile">Category</th>
             <th>Priority</th>
             <th>Status</th>
-            <th class="hide-mobile">Age</th>
-            <th class="hide-mobile">% Done</th>
-            <th class="col-actions">Actions</th>
+            <th class="hide-mobile">Deadline</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="sprint-tbody"></tbody>
@@ -152,28 +307,28 @@
     </div>
   </div>
 
-  <!-- ── KANBAN TAB ────────────────────────────────────────────────────── -->
+  <!-- ══ KANBAN TAB ══════════════════════════════════════════════ -->
   <div id="tab-kanban" class="sprint-tab" style="display:none">
-    <div class="toolbar">
+    <div class="toolbar" style="margin-bottom:12px">
       <button class="btn btn-sm" id="btn-kanban-compact" onclick="sprintToggleCompact()">Compact View</button>
     </div>
     <div class="kanban-board" id="kanban-board"></div>
   </div>
 
-  <!-- ── ANALYSIS TAB ──────────────────────────────────────────────────── -->
+  <!-- ══ ANALYSIS TAB ════════════════════════════════════════════ -->
   <div id="tab-analysis" class="sprint-tab" style="display:none">
-    <div class="sprint-summary" id="analysis-kpi" style="margin-bottom:16px"></div>
+    <div class="analysis-top" id="analysis-top"></div>
     <div class="analysis-grid" id="analysis-grid"></div>
   </div>
 
-  <!-- ── ARCHIVE TAB ───────────────────────────────────────────────────── -->
+  <!-- ══ ARCHIVE TAB ═════════════════════════════════════════════ -->
   <div id="tab-archive" class="sprint-tab" style="display:none">
-    <p class="archive-note">Done tasks are archived after 7 days. To Do / In Progress tasks carry forward each sprint.</p>
+    <p class="archive-note">✅ Done tasks are archived after 7 days. To Do / In Progress tasks carry forward each sprint.</p>
     <div class="table-wrap">
       <table class="table sprint-table">
         <thead>
           <tr>
-            <th>#</th><th>Task</th><th>Category</th>
+            <th>#</th><th>Task</th><th class="hide-mobile">Customer</th>
             <th class="hide-mobile">Priority</th><th class="hide-mobile">Done Date</th><th>Archived</th>
           </tr>
         </thead>
@@ -187,14 +342,23 @@
 
 </div><!-- #sprint-panel -->
 
-<!-- ── TASK MODAL ────────────────────────────────────────────────────────── -->
+<!-- ══ TASK MODAL ════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="sprint-modal" style="display:none" onclick="if(event.target===this)sprintCloseModal()">
-  <div class="modal" style="max-width:580px">
+  <div class="modal" style="max-width:560px">
     <div class="modal-header">
       <span class="modal-title" id="sprint-modal-title">New Task</span>
       <button class="modal-close" onclick="sprintCloseModal()">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="max-height:72vh;overflow-y:auto">
+
+      <!-- Task description -->
+      <div class="input-group">
+        <label class="input-label">📝 Task Description *</label>
+        <textarea id="f_title" class="input" rows="2" placeholder="Describe the task…" style="resize:vertical"></textarea>
+      </div>
+
+      <div class="form-divider"></div>
+      <span class="modal-section-label">Assignment</span>
       <div class="grid-2">
         <div class="input-group">
           <label class="input-label">Assigned To</label>
@@ -203,15 +367,11 @@
         <div class="input-group">
           <label class="input-label">Role</label>
           <select id="f_role" class="input select">
-            <option value="">— Select Role —</option>
+            <option value="">— Role —</option>
             <option>Customer Support</option><option>Development</option>
             <option>QC</option><option>DevOps</option>
           </select>
         </div>
-      </div>
-      <div class="input-group">
-        <label class="input-label">Task Description *</label>
-        <textarea id="f_title" class="input" rows="3" placeholder="Describe the task…"></textarea>
       </div>
       <div class="grid-2">
         <div class="input-group">
@@ -223,6 +383,9 @@
           <input id="f_version" class="input" type="text" placeholder="e.g. v2.4.1">
         </div>
       </div>
+
+      <div class="form-divider"></div>
+      <span class="modal-section-label">Classification</span>
       <div class="grid-2">
         <div class="input-group">
           <label class="input-label">Category</label>
@@ -254,35 +417,38 @@
           </select>
         </div>
       </div>
+
+      <div class="form-divider"></div>
+      <span class="modal-section-label">Dates & Time</span>
       <div class="grid-2">
         <div class="input-group">
           <label class="input-label">Done Date (Shamsi)</label>
-          <input id="f_done_date_shamsi" class="input" type="text" placeholder="auto-filled on Done">
+          <input id="f_done_date_shamsi" class="input" type="text" placeholder="auto-fill on Done">
         </div>
         <div class="input-group">
           <label class="input-label">Due Date (Shamsi)</label>
-          <input id="f_due_date_shamsi" class="input" type="text" placeholder="optional">
+          <input id="f_due_date_shamsi" class="input" type="text" placeholder="e.g. 1403/12/15">
         </div>
       </div>
       <div class="grid-2">
         <div class="input-group">
           <label class="input-label">Notes</label>
-          <input id="f_notes" class="input" type="text" placeholder="Optional notes…">
+          <input id="f_notes" class="input" type="text" placeholder="Optional…">
         </div>
         <div class="input-group">
-          <label class="input-label">Time Spent (hours)</label>
-          <input id="f_time_spend" class="input" type="number" step="0.5" min="0" placeholder="e.g. 2.5">
+          <label class="input-label">Time Spent (hrs)</label>
+          <input id="f_time_spend" class="input" type="number" step="0.5" min="0" placeholder="0.0">
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-sm" onclick="sprintCloseModal()">Cancel</button>
-      <button class="btn btn-primary btn-sm" onclick="sprintSaveTask()">Save Task</button>
+      <button class="btn btn-primary btn-sm" onclick="sprintSaveTask()">💾 Save Task</button>
     </div>
   </div>
 </div>
 
-<!-- ── COMMENTS PANEL ─────────────────────────────────────────────────────── -->
+<!-- ══ COMMENTS PANEL ══════════════════════════════════════════ -->
 <div class="comment-panel" id="sprint-comments">
   <div class="comment-panel-head">
     <span id="sprint-comments-title">Comments</span>
@@ -290,7 +456,7 @@
   </div>
   <div class="comment-list" id="sprint-comment-list"></div>
   <div class="comment-input-area">
-    <textarea class="input" id="sprint-comment-input" placeholder="Add a comment…"></textarea>
-    <button class="btn btn-primary btn-sm" onclick="sprintSendComment()">Send</button>
+    <textarea class="input" id="sprint-comment-input" rows="2" placeholder="Add a comment…" style="resize:none"></textarea>
+    <button class="btn btn-primary btn-sm" onclick="sprintSendComment()">Send ↑</button>
   </div>
 </div>

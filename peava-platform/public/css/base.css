@@ -1,0 +1,169 @@
+/* ============================================================
+   PEAVA PLATFORM — Base Design System
+   Light Neumorphism: #E0E5EC base, shadows #b8bec7 / #ffffff
+   ============================================================ */
+
+/* ---- Font faces (IBM Plex — served locally) ---- */
+@font-face { font-family:'IBM Plex Sans'; font-style:normal; font-weight:300; font-display:swap; src:url('/fonts/IBMPlexSans-Light.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-style:normal; font-weight:400; font-display:swap; src:url('/fonts/IBMPlexSans-Regular.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-style:normal; font-weight:500; font-display:swap; src:url('/fonts/IBMPlexSans-Medium.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-style:normal; font-weight:600; font-display:swap; src:url('/fonts/IBMPlexSans-SemiBold.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Mono'; font-style:normal; font-weight:400; font-display:swap; src:url('/fonts/IBMPlexMono-Regular.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Mono'; font-style:normal; font-weight:600; font-display:swap; src:url('/fonts/IBMPlexMono-SemiBold.woff2') format('woff2'); }
+
+/* ---- CSS Custom Properties ---- */
+:root {
+  /* Neumorphism foundation */
+  --bg:        #E0E5EC;
+  --shadow-d:  #b8bec7;
+  --shadow-l:  #ffffff;
+  --depth:     8px;
+  --radius:    14px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+
+  /* Brand */
+  --teal:      #00928A;
+  --teal-dim:  #007870;
+  --blue:      #4A90D9;
+  --danger:    #D94F3D;
+  --warning:   #E8A838;
+  --success:   #2E9E5B;
+  --purple:    #7B5EA7;
+
+  /* Text */
+  --text:      #2D3748;
+  --text-sub:  #4A5568;
+  --muted:     #8899AA;
+  --label:     #6B7A8D;
+  --on-teal:   #ffffff;
+
+  /* Surfaces */
+  --surface:   #E0E5EC;   /* same as --bg */
+  --surface-2: #eaecf3;   /* slightly lighter — used for hover states */
+
+  /* Fonts */
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* Transitions */
+  --transition: 0.18s ease;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+body {
+  background:  var(--bg);
+  color:       var(--text);
+  font-family: var(--font-sans);
+  font-size:   14px;
+  line-height: 1.5;
+  min-height:  100vh;
+}
+
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+input, select, textarea, button { font-family: inherit; font-size: inherit; }
+
+/* ============================================================
+   NEUMORPHIC UTILITIES
+   ============================================================ */
+
+/* Raised (default card/surface) */
+.neu {
+  background:  var(--bg);
+  border-radius: var(--radius);
+  box-shadow:
+    var(--depth) var(--depth) calc(var(--depth) * 2) var(--shadow-d),
+    calc(var(--depth) * -1) calc(var(--depth) * -1) calc(var(--depth) * 2) var(--shadow-l);
+}
+
+/* Pressed / inset — used for inputs and active nav */
+.neu-pressed {
+  background:  var(--bg);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    inset 4px 4px 8px var(--shadow-d),
+    inset -4px -4px 8px var(--shadow-l);
+}
+
+/* Convex — buttons in resting state */
+.neu-convex {
+  background:  linear-gradient(145deg, #eaeff7, #d6dce4);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    var(--depth) var(--depth) calc(var(--depth) * 2) var(--shadow-d),
+    calc(var(--depth) * -1) calc(var(--depth) * -1) calc(var(--depth) * 2) var(--shadow-l);
+}
+
+/* Flat — subtle separation without full depth */
+.neu-flat {
+  background:    var(--bg);
+  border-radius: var(--radius);
+  box-shadow:    3px 3px 6px var(--shadow-d), -3px -3px 6px var(--shadow-l);
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1 { font-size: 1.6rem; font-weight: 600; color: var(--text); }
+h2 { font-size: 1.25rem; font-weight: 600; color: var(--text); }
+h3 { font-size: 1rem; font-weight: 600; color: var(--text); }
+h4 { font-size: 0.875rem; font-weight: 600; color: var(--text-sub); }
+
+.text-mono  { font-family: var(--font-mono); }
+.text-muted { color: var(--muted); }
+.text-teal  { color: var(--teal); }
+.text-sm    { font-size: 0.8rem; }
+.text-xs    { font-size: 0.72rem; }
+
+/* ============================================================
+   LAYOUT UTILITIES
+   ============================================================ */
+.flex        { display: flex; }
+.flex-col    { display: flex; flex-direction: column; }
+.items-center{ align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-4  { gap: 4px; }
+.gap-8  { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.mt-8   { margin-top: 8px; }
+.mt-16  { margin-top: 16px; }
+.mt-24  { margin-top: 24px; }
+.mb-8   { margin-bottom: 8px; }
+.mb-16  { margin-bottom: 16px; }
+.p-8    { padding: 8px; }
+.p-16   { padding: 16px; }
+.p-24   { padding: 24px; }
+.w-full { width: 100%; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--shadow-d); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .grid-5 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .hide-mobile { display: none !important; }
+}
+@media (max-width: 600px) {
+  .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+  .hide-sm { display: none !important; }
+}

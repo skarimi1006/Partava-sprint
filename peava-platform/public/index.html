@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peava Platform — Login</title>
+<link rel="stylesheet" href="/css/base.css">
+<style>
+  /* ---- Login page specific styles ---- */
+  body {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    min-height:      100vh;
+    background:      var(--bg);
+    padding:         20px;
+  }
+
+  .login-wrap {
+    width:     100%;
+    max-width: 380px;
+    display:   flex;
+    flex-direction: column;
+    gap:       0;
+  }
+
+  /* Floating date chip above card */
+  .login-date {
+    text-align:    center;
+    font-size:     0.75rem;
+    color:         var(--muted);
+    font-family:   var(--font-mono);
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Main card */
+  .login-card {
+    background:    var(--bg);
+    border-radius: var(--radius-lg);
+    padding:       40px 36px 36px;
+    box-shadow:
+      16px 16px 32px var(--shadow-d),
+      -16px -16px 32px var(--shadow-l);
+  }
+
+  /* Logo area */
+  .login-logo {
+    text-align:    center;
+    margin-bottom: 32px;
+  }
+  .login-logo .wordmark {
+    font-family:   var(--font-mono);
+    font-size:     2rem;
+    font-weight:   600;
+    color:         var(--teal);
+    letter-spacing: 6px;
+  }
+  .login-logo .tagline {
+    font-size:  0.72rem;
+    color:      var(--muted);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* Icon inside logo — neumorphic circle */
+  .logo-icon {
+    width:         56px;
+    height:        56px;
+    border-radius: 50%;
+    background:    var(--bg);
+    box-shadow:
+      8px 8px 16px var(--shadow-d),
+      -8px -8px 16px var(--shadow-l);
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    margin:        0 auto 14px;
+    font-size:     1.5rem;
+  }
+
+  /* Form fields */
+  .login-fields {
+    display:        flex;
+    flex-direction: column;
+    gap:            18px;
+    margin-bottom:  26px;
+  }
+
+  .field-label {
+    font-size:      0.7rem;
+    font-weight:    600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color:          var(--label);
+    margin-bottom:  8px;
+  }
+
+  .login-input {
+    width:         100%;
+    padding:       13px 16px;
+    border:        none;
+    border-radius: var(--radius-sm);
+    background:    var(--bg);
+    color:         var(--text);
+    font-size:     0.95rem;
+    font-family:   var(--font-mono);
+    outline:       none;
+    box-shadow:
+      inset 5px 5px 10px var(--shadow-d),
+      inset -5px -5px 10px var(--shadow-l);
+    transition:    box-shadow 0.18s ease;
+  }
+  .login-input:focus {
+    box-shadow:
+      inset 6px 6px 12px var(--shadow-d),
+      inset -6px -6px 12px var(--shadow-l),
+      0 0 0 2px rgba(0,146,138,0.2);
+  }
+  .login-input::placeholder { color: var(--muted); font-size: 0.85rem; }
+
+  /* Login button */
+  .login-btn {
+    width:         100%;
+    padding:       14px;
+    border:        none;
+    border-radius: var(--radius-sm);
+    font-size:     0.9rem;
+    font-weight:   600;
+    font-family:   var(--font-mono);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor:        pointer;
+    transition:    box-shadow 0.18s ease, transform 0.12s ease;
+    background:    linear-gradient(145deg, #00a89e, #007870);
+    color:         #fff;
+    box-shadow:
+      8px 8px 16px rgba(0,120,112,0.4),
+      -8px -8px 16px rgba(255,255,255,0.7);
+  }
+  .login-btn:hover {
+    box-shadow:
+      5px 5px 10px rgba(0,120,112,0.4),
+      -5px -5px 10px rgba(255,255,255,0.7);
+  }
+  .login-btn:active {
+    box-shadow:
+      inset 4px 4px 8px rgba(0,90,84,0.4),
+      inset -4px -4px 8px rgba(255,255,255,0.15);
+    transform: scale(0.98);
+  }
+  .login-btn:disabled {
+    opacity: 0.6;
+    cursor:  not-allowed;
+  }
+
+  /* Error */
+  .login-error {
+    margin-top: 14px;
+    padding:    10px 14px;
+    border-radius: var(--radius-sm);
+    background: rgba(217,79,61,0.08);
+    box-shadow: inset 3px 3px 6px rgba(217,79,61,0.08), inset -3px -3px 6px rgba(255,255,255,0.5);
+    color:      var(--danger);
+    font-size:  0.82rem;
+    text-align: center;
+    display:    none;
+  }
+  .login-error.show { display: block; }
+
+  /* Bottom bar */
+  .login-footer {
+    display:         flex;
+    justify-content: center;
+    margin-top:      20px;
+  }
+  .lang-toggle {
+    background:    var(--bg);
+    border:        none;
+    border-radius: 20px;
+    padding:       6px 16px;
+    font-size:     0.75rem;
+    font-family:   var(--font-mono);
+    color:         var(--muted);
+    cursor:        pointer;
+    box-shadow:    3px 3px 6px var(--shadow-d), -3px -3px 6px var(--shadow-l);
+    transition:    all 0.18s;
+  }
+  .lang-toggle:hover { color: var(--teal); }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <!-- Shamsi date -->
+  <div class="login-date" id="login-date">— —</div>
+
+  <div class="login-card">
+
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="logo-icon">⬡</div>
+      <div class="wordmark">PEAVA</div>
+      <div class="tagline">INTERNAL PLATFORM</div>
+    </div>
+
+    <!-- Form -->
+    <div class="login-fields">
+      <div>
+        <div class="field-label" id="lbl-username">Username</div>
+        <input
+          id="inp-username"
+          class="login-input"
+          type="text"
+          placeholder="username"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+        >
+      </div>
+      <div>
+        <div class="field-label" id="lbl-pin">PIN</div>
+        <input
+          id="inp-pin"
+          class="login-input"
+          type="password"
+          placeholder="••••"
+          autocomplete="current-password"
+          maxlength="16"
+        >
+      </div>
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="login()">
+      <span id="btn-text">LOGIN</span>
+    </button>
+
+    <div class="login-error" id="login-error"></div>
+
+  </div>
+
+  <!-- Language toggle -->
+  <div class="login-footer">
+    <button class="lang-toggle" onclick="toggleLangLogin()">FA / EN</button>
+  </div>
+
+</div>
+
+<script src="/js/shamsi.js"></script>
+<script>
+  var _lang = localStorage.getItem('peava_lang') || 'en';
+
+  // Set Shamsi date
+  document.getElementById('login-date').textContent = shamsiFullDate();
+
+  // If already logged in, redirect
+  fetch('/api/me').then(function(r) {
+    if (r.ok) return r.json();
+  }).then(function(data) {
+    if (data && data.ok) window.location.href = '/app';
+  });
+
+  // Apply language on load
+  applyLang();
+
+  function applyLang() {
+    if (_lang === 'fa') {
+      document.documentElement.setAttribute('dir', 'rtl');
+      document.documentElement.setAttribute('lang', 'fa');
+      document.getElementById('lbl-username').textContent = 'نام کاربری';
+      document.getElementById('lbl-pin').textContent = 'رمز';
+      document.getElementById('btn-text').textContent = 'ورود';
+      document.getElementById('inp-username').placeholder = 'نام کاربری';
+      document.getElementById('inp-pin').placeholder = '••••';
+    } else {
+      document.documentElement.setAttribute('dir', 'ltr');
+      document.documentElement.setAttribute('lang', 'en');
+    }
+  }
+
+  function toggleLangLogin() {
+    _lang = _lang === 'en' ? 'fa' : 'en';
+    localStorage.setItem('peava_lang', _lang);
+    applyLang();
+  }
+
+  function login() {
+    var username = document.getElementById('inp-username').value.trim();
+    var pin      = document.getElementById('inp-pin').value;
+    var btn      = document.getElementById('login-btn');
+    var err      = document.getElementById('login-error');
+
+    if (!username || !pin) {
+      showError(_lang === 'fa' ? 'نام کاربری و رمز الزامی است' : 'Username and PIN are required');
+      return;
+    }
+
+    btn.disabled = true;
+    document.getElementById('btn-text').textContent = _lang === 'fa' ? 'در حال ورود…' : 'LOGGING IN…';
+    err.classList.remove('show');
+
+    fetch('/api/auth/login', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ username: username, pin: pin })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.ok) {
+        window.location.href = data.data.redirect || '/app';
+      } else {
+        showError(data.error || (_lang === 'fa' ? 'اطلاعات اشتباه است' : 'Invalid credentials'));
+        btn.disabled = false;
+        document.getElementById('btn-text').textContent = _lang === 'fa' ? 'ورود' : 'LOGIN';
+      }
+    })
+    .catch(function() {
+      showError(_lang === 'fa' ? 'خطای اتصال' : 'Connection error');
+      btn.disabled = false;
+      document.getElementById('btn-text').textContent = _lang === 'fa' ? 'ورود' : 'LOGIN';
+    });
+  }
+
+  function showError(msg) {
+    var el = document.getElementById('login-error');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  // Enter key support
+  document.getElementById('inp-pin').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') login();
+  });
+  document.getElementById('inp-username').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('inp-pin').focus();
+  });
+</script>
+</body>
+</html>

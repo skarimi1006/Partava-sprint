@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peava Platform</title>
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/components.css">
+<style>
+/* ============================================================
+   App Shell Layout
+   ============================================================ */
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  display:        flex;
+  flex-direction: column;
+  background:     var(--bg);
+}
+
+/* ---- Top Bar ---- */
+#topbar {
+  height:          52px;
+  flex-shrink:     0;
+  background:      var(--bg);
+  display:         flex;
+  align-items:     center;
+  padding:         0 20px;
+  gap:             12px;
+  box-shadow:      0 4px 8px var(--shadow-d), 0 -1px 3px var(--shadow-l);
+  z-index:         100;
+  position:        relative;
+}
+#topbar-title {
+  flex:        1;
+  font-size:   0.95rem;
+  font-weight: 600;
+  color:       var(--text);
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+.topbar-date {
+  font-size:   0.72rem;
+  color:       var(--muted);
+  font-family: var(--font-mono);
+}
+.topbar-btn {
+  background:    var(--bg);
+  border:        none;
+  border-radius: var(--radius-sm);
+  padding:       6px 10px;
+  cursor:        pointer;
+  color:         var(--muted);
+  font-size:     0.8rem;
+  font-family:   var(--font-mono);
+  box-shadow:    3px 3px 6px var(--shadow-d), -3px -3px 6px var(--shadow-l);
+  transition:    all 0.15s;
+}
+.topbar-btn:hover { color: var(--teal); }
+.topbar-btn:active {
+  box-shadow: inset 2px 2px 5px var(--shadow-d), inset -2px -2px 5px var(--shadow-l);
+}
+
+/* Notification bell */
+#notif-btn {
+  position: relative;
+}
+#notif-badge {
+  position:        absolute;
+  top:             -5px;
+  right:           -5px;
+  background:      var(--danger);
+  color:           #fff;
+  font-size:       9px;
+  font-weight:     700;
+  min-width:       16px;
+  height:          16px;
+  border-radius:   8px;
+  display:         none;
+  align-items:     center;
+  justify-content: center;
+  padding:         0 3px;
+}
+
+/* ---- Main body: sidebar + panel ---- */
+#body {
+  flex:     1;
+  display:  flex;
+  overflow: hidden;
+}
+
+/* ---- Sidebar ---- */
+#sidebar {
+  width:          210px;
+  flex-shrink:    0;
+  background:     var(--bg);
+  display:        flex;
+  flex-direction: column;
+  overflow-y:     auto;
+  box-shadow:     4px 0 8px var(--shadow-d), -2px 0 4px var(--shadow-l);
+  z-index:        50;
+  position:       relative;
+}
+
+.sidebar-logo {
+  padding:       20px 18px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.sidebar-logo .wordmark {
+  font-family:   var(--font-mono);
+  font-size:     1.1rem;
+  font-weight:   600;
+  color:         var(--teal);
+  letter-spacing: 4px;
+}
+.sidebar-logo .version {
+  font-size:  0.65rem;
+  color:      var(--muted);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+.nav-section {
+  padding:        12px 18px 4px;
+  font-size:      0.62rem;
+  font-weight:    600;
+  color:          var(--muted);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* Nav items */
+.nav-item {
+  display:       flex;
+  align-items:   center;
+  gap:           10px;
+  padding:       9px 18px;
+  cursor:        pointer;
+  color:         var(--muted);
+  font-size:     0.83rem;
+  font-weight:   500;
+  border-left:   3px solid transparent;
+  transition:    all 0.15s;
+  user-select:   none;
+}
+.nav-item:hover {
+  color:      var(--text-sub);
+  background: rgba(0,0,0,0.025);
+}
+.nav-item.active {
+  color:      var(--teal);
+  border-left-color: var(--teal);
+  /* Pressed neumorphic effect for active state */
+  box-shadow: inset 3px 3px 6px rgba(0,0,0,0.06), inset -3px -3px 6px rgba(255,255,255,0.7);
+  background: rgba(0,146,138,0.04);
+}
+.nav-icon {
+  width:     18px;
+  text-align: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* Sidebar footer — user info */
+.sidebar-user {
+  margin-top:    auto;
+  padding:       16px 18px;
+  border-top:    1px solid rgba(0,0,0,0.05);
+}
+.sidebar-user-info {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  margin-bottom: 10px;
+}
+.sidebar-user-name {
+  font-size:   0.83rem;
+  font-weight: 600;
+  color:       var(--text);
+}
+.sidebar-user-role {
+  font-size:  0.68rem;
+  color:      var(--teal);
+  font-family: var(--font-mono);
+}
+.sidebar-logout {
+  width:         100%;
+  padding:       7px 12px;
+  border:        none;
+  border-radius: var(--radius-sm);
+  background:    var(--bg);
+  color:         var(--muted);
+  font-size:     0.78rem;
+  font-family:   var(--font-mono);
+  cursor:        pointer;
+  box-shadow:    3px 3px 6px var(--shadow-d), -3px -3px 6px var(--shadow-l);
+  transition:    all 0.15s;
+  text-align:    left;
+}
+.sidebar-logout:hover { color: var(--danger); }
+
+/* ---- Panel area ---- */
+#panel {
+  flex:       1;
+  overflow-y: auto;
+  padding:    24px;
+}
+
+/* ---- Mobile sidebar toggle ---- */
+#sidebar-overlay {
+  display:    none;
+  position:   fixed;
+  inset:      0;
+  background: rgba(200,205,215,0.5);
+  z-index:    49;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 900px) {
+  #sidebar {
+    position:   fixed;
+    top:        0;
+    left:       0;
+    bottom:     0;
+    z-index:    200;
+    transform:  translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+  #sidebar.open {
+    transform: translateX(0);
+  }
+  #sidebar-overlay.show { display: block; }
+  #panel { padding: 16px; }
+  #menu-btn { display: flex !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <button class="topbar-btn" id="menu-btn" style="display:none" onclick="toggleSidebar()">☰</button>
+  <span id="topbar-title">Sprint Board</span>
+  <span class="topbar-date" id="topbar-date"></span>
+  <button class="topbar-btn" onclick="toggleLang()" title="Toggle language">FA/EN</button>
+  <button class="topbar-btn topbar-btn-notif" id="notif-btn" onclick="toggleNotifPanel()" title="Notifications">
+    🔔
+    <span id="notif-badge">0</span>
+  </button>
+</div>
+
+<!-- BODY -->
+<div id="body">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-logo">
+      <div class="wordmark">PEAVA</div>
+      <div class="version">v1.0.0 · Internal Platform</div>
+    </div>
+
+    <nav id="nav">
+      <!-- Populated by JS based on user permissions -->
+    </nav>
+
+    <div class="sidebar-user" id="sidebar-user">
+      <div class="sidebar-user-info">
+        <div class="avatar avatar-teal" id="user-avatar">?</div>
+        <div>
+          <div class="sidebar-user-name" id="user-name">—</div>
+          <div class="sidebar-user-role" id="user-role">—</div>
+        </div>
+      </div>
+      <button class="sidebar-logout" onclick="logout()">⎋ <span id="lbl-logout">Logout</span></button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- PANEL -->
+  <div id="panel">
+    <div style="padding:60px;text-align:center">
+      <div class="spinner" style="margin:0 auto 16px"></div>
+      <div style="color:var(--muted);font-size:0.82rem">Loading…</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-head" id="notif-head">Notifications</div>
+  <div class="notif-list" id="notif-list">
+    <div class="empty-state" style="padding:20px"><p>No notifications</p></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<script src="/js/shamsi.js"></script>
+<script src="/js/core.js"></script>
+<script>
+// ----------------------------------------------------------------
+// Navigation structure — icon + module key
+// ----------------------------------------------------------------
+var NAV_STRUCTURE = [
+  { section: 'Operations' },
+  { module: 'sprint',      icon: '▣', label: 'Sprint Board',    labelFa: 'تابلو اسپرینت' },
+  { module: 'assets',      icon: '◈', label: 'Assets',          labelFa: 'تجهیزات' },
+  { module: 'qc',          icon: '✓', label: 'QC Tests',        labelFa: 'آزمون QC' },
+  { module: 'issues',      icon: '⚑', label: 'Issues',          labelFa: 'مشکلات' },
+  { section: 'Releases' },
+  { module: 'deployments', icon: '↑', label: 'Deployments',     labelFa: 'استقرار' },
+  { module: 'delivery',    icon: '✉', label: 'Delivery',        labelFa: 'ارسال نسخه' },
+  { section: 'Knowledge' },
+  { module: 'knowledge',   icon: '≡', label: 'Knowledge Base',  labelFa: 'پایگاه دانش' },
+  { module: 'reports',     icon: '◎', label: 'Reports',         labelFa: 'گزارش‌ها' }
+];
+
+// ----------------------------------------------------------------
+// Init
+// ----------------------------------------------------------------
+var _lang = localStorage.getItem('peava_lang') || 'en';
+
+// Apply lang/dir before any content renders
+if (_lang === 'fa') {
+  document.documentElement.setAttribute('dir', 'rtl');
+  document.documentElement.setAttribute('lang', 'fa');
+}
+
+// Set shamsi date in topbar
+document.getElementById('topbar-date').textContent = shamsiFullDate();
+
+// Load user + build nav
+initSession(function(user) {
+  // Populate user area
+  document.getElementById('user-name').textContent  = user.full_name;
+  document.getElementById('user-role').textContent  = user.role === 'admin' ? '● Admin' : '● Member';
+  document.getElementById('user-avatar').textContent = user.full_name.charAt(0).toUpperCase();
+
+  // Update logout label if FA
+  if (_lang === 'fa') document.getElementById('lbl-logout').textContent = 'خروج';
+
+  // Build navigation
+  buildNav(user.modules || []);
+
+  // Load default panel (first allowed module)
+  var firstModule = (user.modules && user.modules[0]) || 'sprint';
+  loadPanel(firstModule);
+
+  // Start notification polling
+  startNotifPolling();
+});
+
+// ----------------------------------------------------------------
+// Build sidebar navigation
+// ----------------------------------------------------------------
+function buildNav(allowedModules) {
+  var nav = document.getElementById('nav');
+  var html = '';
+  var allowed = new Set(allowedModules);
+
+  NAV_STRUCTURE.forEach(function(item) {
+    if (item.section) {
+      var sectionLabel = _lang === 'fa' ? sectionFa(item.section) : item.section;
+      html += '<div class="nav-section">' + sectionLabel + '</div>';
+    } else if (allowed.has(item.module)) {
+      var label = _lang === 'fa' ? item.labelFa : item.label;
+      html += '<div class="nav-item" data-module="' + item.module + '" onclick="navClick(\'' + item.module + '\')">' +
+        '<span class="nav-icon">' + item.icon + '</span>' +
+        '<span>' + label + '</span>' +
+        '</div>';
+    }
+  });
+
+  nav.innerHTML = html;
+}
+
+function sectionFa(s) {
+  var map = { Operations: 'عملیات', Releases: 'نسخه‌ها', Knowledge: 'دانش' };
+  return map[s] || s;
+}
+
+// ----------------------------------------------------------------
+// Navigation click
+// ----------------------------------------------------------------
+function navClick(moduleName) {
+  loadPanel(moduleName);
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ----------------------------------------------------------------
+// Toggle lang
+// ----------------------------------------------------------------
+function toggleLang() {
+  _lang = _lang === 'en' ? 'fa' : 'en';
+  localStorage.setItem('peava_lang', _lang);
+  window.location.reload();
+}
+
+// ----------------------------------------------------------------
+// Logout
+// ----------------------------------------------------------------
+function logout() {
+  api.post('/api/auth/logout').then(function() {
+    window.location.href = '/';
+  });
+}
+
+// ----------------------------------------------------------------
+// Mobile sidebar
+// ----------------------------------------------------------------
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+
+// Override loadPanel to update title
+var _coreLoadPanel = loadPanel;
+loadPanel = function(moduleName) {
+  var names = _lang === 'fa' ? MODULE_NAMES_FA : MODULE_NAMES;
+  var titleEl = document.getElementById('topbar-title');
+  if (titleEl) titleEl.textContent = names[moduleName] || moduleName;
+  _coreLoadPanel(moduleName);
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+node_modules/
+data/peava.db
+data/backups/
+uploads/
+assets/signatures/
+*.log

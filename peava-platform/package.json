@@ -1,0 +1,10 @@
+{
+  "name": "peava-platform",
+  "version": "1.0.0",
+  "description": "Part Ava Internal Operations Platform",
+  "main": "server.js",
+  "dependencies": {
+    "better-sqlite3": "^9.0.0",
+    "nodemailer": "^6.0.0"
+  }
+}

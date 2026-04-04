@@ -1,0 +1,5 @@
+node_modules/
+*.db-shm
+*.db-wal
+*.db-journal
+.DS_Store

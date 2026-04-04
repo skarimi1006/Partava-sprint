@@ -22,6 +22,7 @@ const { toShamsi }    = require('./core/shamsi');
 require('./modules/sprint').register(router, db);
 
 const PUB_DIR = path.join(__dirname, 'public');
+const MOD_DIR = path.join(__dirname, 'modules');
 
 // ---------------------------------------------------------------------------
 // Static file server
@@ -53,6 +54,8 @@ function serveStatic(req, res) {
   const p = new URL(req.url, 'http://localhost').pathname;
   if (p === '/' || p === '/index.html') return serveFile(res, path.join(PUB_DIR, 'index.html'));
   if (p === '/app' || p === '/app.html')  return serveFile(res, path.join(PUB_DIR, 'app.html'));
+  // Serve module panel.html / panel.js from the modules/ directory
+  if (p.startsWith('/modules/')) return serveFile(res, path.join(MOD_DIR, p.slice('/modules/'.length)));
   return serveFile(res, path.join(PUB_DIR, p.slice(1)));
 }
 

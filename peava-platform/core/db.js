@@ -110,27 +110,29 @@ db.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS tasks (
-    id            TEXT PRIMARY KEY,
-    title         TEXT NOT NULL,
-    category      TEXT NOT NULL CHECK(category IN ('QC Test','R&D','Development','Bug Fix','Follow Up')),
-    priority      TEXT NOT NULL CHECK(priority IN ('Low','Medium','High','Critical')),
-    status        TEXT NOT NULL CHECK(status IN ('To Do','In Progress','Done')),
-    assigned_to   TEXT REFERENCES users(id),
-    team_id       TEXT NOT NULL REFERENCES teams(id),
-    customer_id   TEXT REFERENCES customers(id),
-    source_module TEXT,
-    source_id     TEXT,
-    version       TEXT,
-    notes         TEXT,
-    time_spend    REAL NOT NULL DEFAULT 0,
-    due_date      INTEGER,
-    done_date     INTEGER,
+    id               TEXT PRIMARY KEY,
+    title            TEXT NOT NULL,
+    category         TEXT NOT NULL CHECK(category IN ('QC Test','R&D','Development','Bug Fix','Follow Up')),
+    priority         TEXT NOT NULL CHECK(priority IN ('Low','Medium','High','Critical')),
+    status           TEXT NOT NULL CHECK(status IN ('To Do','In Progress','Done')),
+    pct              TEXT NOT NULL DEFAULT '0%',
+    role             TEXT,
+    assigned_to      TEXT REFERENCES users(id),
+    team_id          TEXT NOT NULL REFERENCES teams(id),
+    customer_id      TEXT REFERENCES customers(id),
+    source_module    TEXT,
+    source_id        TEXT,
+    version          TEXT,
+    notes            TEXT,
+    time_spend       REAL NOT NULL DEFAULT 0,
+    due_date         INTEGER,
+    done_date        INTEGER,
     done_date_shamsi TEXT,
-    archived      INTEGER NOT NULL DEFAULT 0,
-    archived_at   INTEGER,
-    created_by    TEXT NOT NULL REFERENCES users(id),
-    created_at    INTEGER NOT NULL,
-    updated_at    INTEGER NOT NULL
+    archived         INTEGER NOT NULL DEFAULT 0,
+    archived_at      INTEGER,
+    created_by       TEXT NOT NULL REFERENCES users(id),
+    created_at       INTEGER NOT NULL,
+    updated_at       INTEGER NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS task_comments (
@@ -322,6 +324,30 @@ function seed() {
     }
 
     console.log('Database seeded — default admin: saeed / 1234');
+  }
+
+  // Customers — seed default list if empty
+  if (db.prepare('SELECT COUNT(*) as c FROM customers').get().c === 0) {
+    const customers = [
+      { code: 'PEP',      name: 'PEP',               type: 'psp' },
+      { code: 'PEA',      name: 'PEA',               type: 'psp' },
+      { code: 'PNA',      name: 'PNA',               type: 'psp' },
+      { code: 'IRKISH',   name: 'IrKish',            type: 'psp' },
+      { code: 'FANAVA',   name: 'Fanava',             type: 'psp' },
+      { code: 'OMID',     name: 'Omid',               type: 'psp' },
+      { code: 'SEPEHR',   name: 'Sepehr',             type: 'bank' },
+      { code: 'SEP',      name: 'SEP',               type: 'psp' },
+      { code: 'NAVACO',   name: 'Navaco',             type: 'psp' },
+      { code: 'SADAD',    name: 'Sadad',              type: 'psp' },
+      { code: 'REFAH',    name: 'Refah Bank',         type: 'bank' },
+      { code: 'NABIZADEH',name: 'Nabizadeh',          type: 'other' },
+      { code: 'AVAPLUS',  name: 'Ava Plus',           type: 'other' },
+      { code: 'THPARTY',  name: 'Third Party',        type: 'other' },
+      { code: 'INTERNAL', name: 'Internal',           type: 'internal' },
+    ];
+    const stmt = db.prepare('INSERT INTO customers (id,code,full_name,type,active,created_at) VALUES (?,?,?,?,1,?)');
+    for (const c of customers) stmt.run(genId(), c.code, c.name, c.type, now);
+    console.log('Customers seeded — ' + customers.length + ' default customers added');
   }
 }
 

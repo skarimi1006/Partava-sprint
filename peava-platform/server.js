@@ -16,6 +16,11 @@ const perms           = require('./core/permissions');
 const notif           = require('./core/notifications');
 const { toShamsi }    = require('./core/shamsi');
 
+// ---------------------------------------------------------------------------
+// Modules
+// ---------------------------------------------------------------------------
+require('./modules/sprint').register(router, db);
+
 const PUB_DIR = path.join(__dirname, 'public');
 
 // ---------------------------------------------------------------------------
@@ -282,7 +287,8 @@ function checkWeeklyReset() {
   const todayStr = now.toISOString().split('T')[0];
   const meta     = db.prepare("SELECT id FROM audit_log WHERE action='sprint_reset' AND detail LIKE ? ORDER BY created_at DESC LIMIT 1").get('%' + todayStr + '%');
   if (meta) return;  // already reset today
-  db.prepare("UPDATE tasks SET archived=1, archived_at=? WHERE archived=0").run(Date.now());
+  // Only archive Done tasks — To Do and In Progress carry forward to next sprint
+  db.prepare("UPDATE tasks SET archived=1, archived_at=? WHERE status='Done' AND archived=0").run(Date.now());
   // Write a sentinel audit entry so we don't reset again today
   db.prepare("INSERT INTO audit_log (id,user_id,action,module,record_id,detail,ip,created_at) VALUES (?,?,?,?,?,?,?,?)").run(
     auth.genId(), null, 'sprint_reset', 'sprint', null, JSON.stringify({ date: todayStr }), null, Date.now()

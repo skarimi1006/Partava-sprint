@@ -68,7 +68,7 @@ function loadPanel(moduleName) {
   // Load panel HTML (cached)
   if (_panelCache[moduleName]) {
     panel.innerHTML = _panelCache[moduleName];
-    initPanelScripts(moduleName);
+    _loadPanelScript(moduleName, function() { initPanelScripts(moduleName); });
     return;
   }
 
@@ -82,11 +82,30 @@ function loadPanel(moduleName) {
     .then(function(html) {
       _panelCache[moduleName] = html;
       panel.innerHTML = html;
-      initPanelScripts(moduleName);
+      // Load module panel.js once, then init
+      _loadPanelScript(moduleName, function() {
+        initPanelScripts(moduleName);
+      });
     })
     .catch(function() {
       panel.innerHTML = '<div class="empty-state"><div class="icon">🚧</div><p>Module coming soon</p></div>';
     });
+}
+
+// Load panel.js for a module once (browser caches subsequent requests)
+function _loadPanelScript(moduleName, cb) {
+  var scriptId = 'panel-js-' + moduleName;
+  if (document.getElementById(scriptId)) {
+    // Already loaded
+    if (typeof cb === 'function') cb();
+    return;
+  }
+  var s   = document.createElement('script');
+  s.id    = scriptId;
+  s.src   = '/modules/' + moduleName + '/panel.js';
+  s.onload  = function() { if (typeof cb === 'function') cb(); };
+  s.onerror = function() { if (typeof cb === 'function') cb(); };  // still init even if no JS
+  document.head.appendChild(s);
 }
 
 // Trigger module init function if it exists (e.g. window.initSprint)

@@ -1,1 +1,9 @@
-// Module: sprint — panel and routes will be added in a future phase
+'use strict';
+
+const routes = require('./routes');
+
+module.exports = {
+  register(router, db) {
+    routes.register(router, db);
+  }
+};
